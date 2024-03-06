@@ -16,6 +16,8 @@ func NewRouter() http.Handler {
 
 	mux.HandleFunc("/minion", minionHandler)
 
+	mux.HandleFunc("/api", apiRootHandler)
+
 	return mux
 }
 
@@ -23,7 +25,9 @@ func minionHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("./templates/fragments/minion.html"))
 	err := tmpl.Execute(w, nil)
 	if err != nil {
-		log.Panicln("minionHandler: error executing template")
+		log.Printf("minionHandler: error executing templatel; err: %s", err)
+		http.Error(w, "D'oh, something went wrong!", http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -31,6 +35,8 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("./templates/index.html"))
 	err := tmpl.Execute(w, nil)
 	if err != nil {
-		log.Panicln("rootHandler: error executing template")
+		log.Printf("rootHandler: error executing template; err: %s", err)
+		http.Error(w, "D'oh, something went wrong!", http.StatusInternalServerError)
+		return
 	}
 }
