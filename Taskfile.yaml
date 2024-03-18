@@ -25,3 +25,5 @@ tasks:
     deps: [run]
     sources: 
       - '**/*.go'
+      - '**/*.html'
+      - '**/*.css'
