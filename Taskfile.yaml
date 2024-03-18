@@ -1,0 +1,27 @@
+version: '3'
+
+interval: 1s
+concurrency: 1
+
+env:
+  MAIN: cmd/cs-stalker/main.go
+
+tasks:
+  kill_run:
+    internal: true
+    ignore_error: true # incase nothing is running
+    cmds:
+      - pkill -f -SIGKILL "/tmp/go-build"
+    
+  run:
+    desc: Runs the go application.
+    deps: [kill_run]
+    cmds:
+      - go run $MAIN
+
+  watch:
+    desc: Watches for changes and runs go application
+    watch: true
+    deps: [run]
+    sources: 
+      - '**/*.go'
