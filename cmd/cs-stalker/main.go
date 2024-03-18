@@ -2,15 +2,13 @@ package main
 
 import (
 	"fmt"
+	"github.com/finnbechinka/cs-stalker/internal/api"
+	"github.com/finnbechinka/cs-stalker/internal/routes"
+	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
-
-	"github.com/finnbechinka/cs-stalker/internal/routes"
-	"github.com/finnbechinka/cs-stalker/internal/api"
-	"github.com/joho/godotenv"
 )
-
 
 func main() {
 	log.Println("cs-stalker started")
@@ -44,6 +42,5 @@ func main() {
 	id, _ = api.ResolveVanityUrl("76561198056395137")
 	log.Printf(id)
 
-	
 	log.Fatal(s.ListenAndServe())
 }
