@@ -1,0 +1,91 @@
+/* https://blog.logrocket.com/what-should-modern-css-boilerplate-look-like/ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  border: none;
+}
+
+html {
+  font-size: 62.5%;
+  /* (62.5/100) * 16px = 10px */
+  -webkit-text-size-adjust: none;
+  /* for iOS Safari */
+  text-size-adjust: none;
+  /* for other mobile browsers */
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+menu:not(article menu),
+ol:not(article ol),
+ul:not(article ul) {
+  list-style: none;
+}
+
+menu,
+ol,
+ul {
+  padding-left: 0;
+}
+
+article ol,
+article ul {
+  list-style-position: inside;
+}
+
+a {
+  /* Places underlines below the descenders */
+  text-underline-position: under;
+
+  /* Sets the thickness as a percentage of the font size */
+  text-decoration-thickness: 8;
+}
+
+label,
+button,
+select,
+summary,
+[type=radio],
+[type=submit],
+[type=checkbox] {
+  cursor: pointer;
+}
+
+/* https://blog.logrocket.com/what-should-modern-css-boilerplate-look-like/ */
+:root {
+  /* https://cdn.imgchest.com/files/l7lxc2dvd57.png */
+  --rich-black: hsla(202, 77%, 7%, 1);
+  --dark-slate-gray: hsla(175, 41%, 16%, 1);
+  --wheat: hsla(38, 68%, 81%, 1);
+  --mahogany: hsla(22, 100%, 38%, 1);
+  --dark-purple: hsla(330, 29%, 20%, 1);
+}
+
+html {
+  font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: var(--wheat);
+}
+
+body {
+  background-color: var(--dark-slate-gray);
+  font-size: 1.6rem;
+}
+
+button {
+  background-color: var(--rich-black);
+  color: var(--wheat);
+}

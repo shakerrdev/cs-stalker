@@ -2,13 +2,13 @@
 
 <head>
   <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-  <link rel="stylesheet" href="../static/index.css" />
+  <link rel="stylesheet" href="/static/index.css" />
 </head>
 
 <body>
   <h1>BANANA</h1>
   <div id="minion">
-    <button hx-get="/minion" hx-trigger="click" hx-target="#minion">ROFL</button>
+    <button hx-get="/minion" hx-trigger="click once" hx-target="#minion" hx-swap="outerHTML">ROFL</button>
   </div>
 </body>
 
