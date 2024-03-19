@@ -35,11 +35,13 @@ func main() {
 
 	log.Println(fmt.Sprintf("server listening on http://localhost%s", port))
 
-	id, _ := api.ResolveVanityUrl("cantremovethis")
+	id, _ := api.ResolveUrl("cantremovethis")
 	log.Printf(id)
-	id, _ = api.ResolveVanityUrl("https://steamcommunity.com/id/cantremovethis/")
+	id, _ = api.ResolveUrl("https://steamcommunity.com/id/cantremovethis/")
 	log.Printf(id)
-	id, _ = api.ResolveVanityUrl("76561198056395137")
+	id, _ = api.ResolveUrl("76561198056395137")
+	log.Printf(id)
+	id, _ = api.ResolveUrl("http://steamcommunity.com/profiles/76561198056395137")
 	log.Printf(id)
 
 	log.Fatal(s.ListenAndServe())
