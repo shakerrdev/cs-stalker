@@ -10,14 +10,15 @@ func NewRouter() http.Handler {
 	mux := http.NewServeMux()
 
 	// resolve requests to staticfiles (css, imgs, ...)
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	mux.HandleFunc("/", rootHandler)
+	mux.HandleFunc("GET /", rootHandler)
 
-	mux.HandleFunc("/minion", minionHandler)
+	mux.HandleFunc("GET /minion", minionHandler)
 
-	mux.HandleFunc("/api", apiRootHandler)
+	mux.HandleFunc("GET /api", apiRootHandler)
 
+	mux.HandleFunc("GET /api/resolveurl", apiResolveUrlHandler)
 	return mux
 }
 

@@ -2,13 +2,29 @@ package main
 
 import (
 	"fmt"
-	"github.com/finnbechinka/cs-stalker/internal/api"
-	"github.com/finnbechinka/cs-stalker/internal/routes"
-	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
+	"strings"
+
+	"github.com/finnbechinka/cs-stalker/internal/api"
+	"github.com/finnbechinka/cs-stalker/internal/routes"
+	"github.com/joho/godotenv"
 )
+
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/"{
+			// make sure **/x is reachable from **/x/ 
+			// ref: https://natedenlinger.com/dealing-with-trailing-slashes-on-requesturi-in-go-with-mux/
+			r.URL.Path = strings.TrimSuffix(r.URL.Path, "/")
+		}
+		// Do stuff here
+		log.Printf("INCOMING REQUEST: %s %s", r.Method, r.RequestURI)
+		// Call the next handler, which can be another middleware in the chain, or the final handler.
+		next.ServeHTTP(w, r)
+	})
+}
 
 func main() {
 	log.Println("cs-stalker started")
@@ -25,7 +41,7 @@ func main() {
 		log.Panicf("no steam api key env var set")
 	}
 
-	router := routes.NewRouter()
+	router := loggingMiddleware(routes.NewRouter())
 	port := ":8085"
 
 	s := &http.Server{
@@ -37,6 +53,9 @@ func main() {
 
 	id, _ := api.UserSummary("76561198056395137")
 	log.Printf("%+v", id)
+
+	time, _ := api.UserPlaytime("76561198056395137")
+	log.Printf("%d", time)
 
 	log.Fatal(s.ListenAndServe())
 }
