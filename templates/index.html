@@ -20,6 +20,10 @@
       <div id="minion">
         <button hx-get="/minion" hx-trigger="click once" hx-target="#minion" hx-swap="outerHTML">ROFL</button>
       </div>
+      <form hx-post="/profile" hx-target="#profile">
+        <input type="url" name="url" placeholder="https://steamcommunity.com/id/xyz">
+      </form>
+      <div id="profile"></div>
     </div>
   </main>
   <footer><label>© 2024 - finn</label></footer>

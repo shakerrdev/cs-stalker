@@ -14,8 +14,8 @@ import (
 
 func loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/"{
-			// make sure **/x is reachable from **/x/ 
+		if r.URL.Path != "/" {
+			// make sure **/x is reachable from **/x/
 			// ref: https://natedenlinger.com/dealing-with-trailing-slashes-on-requesturi-in-go-with-mux/
 			r.URL.Path = strings.TrimSuffix(r.URL.Path, "/")
 		}

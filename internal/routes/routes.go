@@ -4,6 +4,8 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+
+	"github.com/finnbechinka/cs-stalker/internal/api"
 )
 
 func NewRouter() http.Handler {
@@ -19,6 +21,8 @@ func NewRouter() http.Handler {
 	mux.HandleFunc("GET /api", apiRootHandler)
 
 	mux.HandleFunc("GET /api/resolveurl", apiResolveUrlHandler)
+
+	mux.HandleFunc("POST /profile", profilePostHandler)
 	return mux
 }
 
@@ -37,6 +41,20 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	err := tmpl.Execute(w, nil)
 	if err != nil {
 		log.Printf("rootHandler: error executing template; err: %s", err)
+		http.Error(w, "D'oh, something went wrong!", http.StatusInternalServerError)
+		return
+	}
+}
+
+func profilePostHandler(w http.ResponseWriter, r *http.Request) {
+	url := r.PostFormValue("url")
+	steam64id, _ := api.ResolveUrl(url)
+	summary, _ := api.UserSummary(steam64id)
+
+	tmpl := template.Must(template.ParseFiles("./templates/fragments/profile.html"))
+	err := tmpl.Execute(w, summary)
+	if err != nil {
+		log.Printf("profilePostHandler: error executing template; err: %s", err)
 		http.Error(w, "D'oh, something went wrong!", http.StatusInternalServerError)
 		return
 	}
