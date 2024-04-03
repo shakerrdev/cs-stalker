@@ -57,5 +57,12 @@ func main() {
 	time, _ := api.UserPlaytime("76561198056395137")
 	log.Printf("%d", time)
 
+	profile, _ := api.LeetifyProfile("76561198056395137")
+	log.Printf("%+v", profile)
+
+	_, err = api.LeetifyProfile("76561198801755202")
+	if err != nil {
+		log.Println(err)
+	}
 	log.Fatal(s.ListenAndServe())
 }
