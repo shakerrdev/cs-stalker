@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"net/http"
 	"os"
 	"strings"
 )
@@ -20,7 +19,7 @@ type Summary struct {
 func resolveVanityUrl(vanityUrl string) (string, error) {
 	// https://partner.steamgames.com/doc/webapi/ISteamUser#ResolveVanityURL
 	requestUrl := fmt.Sprintf("https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/?key=%s&vanityurl=%s", os.Getenv("STEAMAPIKEY"), vanityUrl)
-	resp, err := http.Get(requestUrl)
+	resp, err := steamClient.Get(requestUrl)
 	if err != nil {
 		return "", fmt.Errorf("ResolveVanityUrl: %w", err)
 	}
@@ -98,7 +97,7 @@ func UserSummary(steam64id string) (Summary, error) {
 	requestUrl := fmt.Sprintf("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=%s&steamids=%s", os.Getenv("STEAMAPIKEY"), steam64id)
 
 	log.Printf("GET %s", requestUrl)
-	resp, err := http.Get(requestUrl)
+	resp, err := steamClient.Get(requestUrl)
 	if err != nil {
 		return Summary{}, fmt.Errorf("UserSummary: %w", err)
 	}
@@ -154,7 +153,7 @@ func UserPlaytime(steamid64 string) (int32, error) {
 	requestUrl := fmt.Sprintf("https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v1/?key=%s&steamid=%s", os.Getenv("STEAMAPIKEY"), steamid64)
 
 	log.Printf("GET %s", requestUrl)
-	resp, err := http.Get(requestUrl)
+	resp, err := steamClient.Get(requestUrl)
 	if err != nil {
 		return 0, fmt.Errorf("UserPlaytime: %w", err)
 	}

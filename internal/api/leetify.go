@@ -62,7 +62,7 @@ func LeetifyProfile(steam64id string) (Profile, error) {
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", os.Getenv("LEETIFY_AUTH_TOKEN")))
 
     log.Printf("GET %s", url)
-		res, err := http.DefaultClient.Do(req)
+		res, err := leetifyClient.Do(req)
 		if err != nil {
 			return Profile{}, fmt.Errorf("LeetifyProfile: %w", err)
 		}

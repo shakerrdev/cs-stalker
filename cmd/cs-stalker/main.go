@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/finnbechinka/cs-stalker/internal/api"
+	// "github.com/finnbechinka/cs-stalker/internal/api"
 	"github.com/finnbechinka/cs-stalker/internal/routes"
 	"github.com/joho/godotenv"
 )
@@ -41,6 +41,13 @@ func main() {
 		log.Panicf("no steam api key env var set")
 	}
 
+	evar, exists = os.LookupEnv("LEETIFY_AUTH_TOKEN")
+	if exists {
+		log.Printf("leetify auth token: %s...", evar[:5])
+	} else {
+		log.Panicf("no leetify auth token env var set")
+	}
+
 	router := loggingMiddleware(routes.NewRouter())
 	port := ":8085"
 
@@ -51,14 +58,14 @@ func main() {
 
 	log.Println(fmt.Sprintf("server listening on http://localhost%s", port))
 
-	id, _ := api.UserSummary("76561198056395137")
-	log.Printf("UserSummary: %+v", id)
+	// id, _ := api.UserSummary("76561198056395137")
+	// log.Printf("UserSummary: %+v", id)
 
-	time, _ := api.UserPlaytime("76561198056395137")
-	log.Printf("UserPlaytime: %d", time)
+	// time, _ := api.UserPlaytime("76561198056395137")
+	// log.Printf("UserPlaytime: %d", time)
 
-	profile, _ := api.LeetifyProfile("76561198056395137")
-	log.Printf("LeetifyProfile: %+v", profile)
+	// profile, _ := api.LeetifyProfile("76561198056395137")
+	// log.Printf("LeetifyProfile: %+v", profile)
 
 	// _, err = api.LeetifyProfile("76561198801755202")
 	// if err != nil {
