@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"log"
 )
 
 type Profile struct {
@@ -46,29 +47,37 @@ type Profile struct {
 }
 
 func LeetifyProfile(steam64id string) (Profile, error) {
-
-	url := fmt.Sprintf("https://api.leetify.com/api/profile/%s", steam64id)
-
-	req, err := http.NewRequest("GET", url, nil)
-
-	req.Header.Add("Accept", "application/json, text/plain, */*")
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", os.Getenv("LEETIFY_AUTH_TOKEN")))
-
-	res, err := http.DefaultClient.Do(req)
-
-	if err != nil {
-		return Profile{}, fmt.Errorf("LeetifyProfile: %w", err)
+	endpoints := []string{
+		fmt.Sprintf("https://api.leetify.com/api/profile/id/%s", steam64id),
+		fmt.Sprintf("https://api.leetify.com/api/profile/%s", steam64id),
 	}
 
-	if res.StatusCode != 200 {
-		return Profile{}, fmt.Errorf("LeetifyProfile: status is not 200 OK!")
+	for _, url := range endpoints {
+		req, err := http.NewRequest("GET", url, nil)
+		if err != nil {
+			return Profile{}, fmt.Errorf("LeetifyProfile: %w", err)
+		}
+
+		req.Header.Add("Accept", "application/json, text/plain, */*")
+		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", os.Getenv("LEETIFY_AUTH_TOKEN")))
+
+    log.Printf("GET %s", url)
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return Profile{}, fmt.Errorf("LeetifyProfile: %w", err)
+		}
+		defer res.Body.Close()
+
+		if res.StatusCode == 200 {
+			body, _ := io.ReadAll(res.Body)
+
+			var profile Profile
+			json.Unmarshal(body, &profile)
+
+			return profile, nil
+		}
 	}
 
-	defer res.Body.Close()
-	body, _ := io.ReadAll(io.Reader(res.Body))
-
-	var profile Profile
-	json.Unmarshal(body, &profile)
-
-	return profile, nil
+	return Profile{}, fmt.Errorf("LeetifyProfile: no valid profile found (tried both /id and plain endpoints)")
 }
+

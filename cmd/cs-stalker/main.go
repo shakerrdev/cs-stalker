@@ -52,17 +52,17 @@ func main() {
 	log.Println(fmt.Sprintf("server listening on http://localhost%s", port))
 
 	id, _ := api.UserSummary("76561198056395137")
-	log.Printf("%+v", id)
+	log.Printf("UserSummary: %+v", id)
 
 	time, _ := api.UserPlaytime("76561198056395137")
-	log.Printf("%d", time)
+	log.Printf("UserPlaytime: %d", time)
 
 	profile, _ := api.LeetifyProfile("76561198056395137")
-	log.Printf("%+v", profile)
+	log.Printf("LeetifyProfile: %+v", profile)
 
-	_, err = api.LeetifyProfile("76561198801755202")
-	if err != nil {
-		log.Println(err)
-	}
+	// _, err = api.LeetifyProfile("76561198801755202")
+	// if err != nil {
+	// 	log.Println(err)
+	// }
 	log.Fatal(s.ListenAndServe())
 }
