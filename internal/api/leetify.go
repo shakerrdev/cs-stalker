@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
-	"log"
 )
 
 type Profile struct {
@@ -61,7 +61,7 @@ func LeetifyProfile(steam64id string) (Profile, error) {
 		req.Header.Add("Accept", "application/json, text/plain, */*")
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", os.Getenv("LEETIFY_AUTH_TOKEN")))
 
-    log.Printf("GET %s", url)
+		log.Printf("GET %s", url)
 		res, err := leetifyClient.Do(req)
 		if err != nil {
 			return Profile{}, fmt.Errorf("LeetifyProfile: %w", err)
@@ -80,4 +80,3 @@ func LeetifyProfile(steam64id string) (Profile, error) {
 
 	return Profile{}, fmt.Errorf("LeetifyProfile: no valid profile found (tried both /id and plain endpoints)")
 }
-

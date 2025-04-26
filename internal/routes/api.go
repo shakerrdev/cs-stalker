@@ -10,7 +10,7 @@ import (
 )
 
 func apiRootHandler(w http.ResponseWriter, r *http.Request) {
-	
+
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 
@@ -27,13 +27,12 @@ func apiRootHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(json)
 }
 
-
 func apiResolveUrlHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 
 	url := r.FormValue("url")
-	if url == ""{
+	if url == "" {
 		log.Println("apiResolveUrlHandler: no url query param, FormValue returned empty string")
 		http.Error(w, "D'oh, something went wrong!", http.StatusInternalServerError)
 		return
@@ -41,7 +40,7 @@ func apiResolveUrlHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	steam64id, err := api.ResolveUrl(url)
-	if err != nil{
+	if err != nil {
 		log.Println(fmt.Errorf("apiResolveUrlHandler: %w", err))
 		http.Error(w, "D'oh, something went wrong!", http.StatusInternalServerError)
 		return
@@ -59,4 +58,3 @@ func apiResolveUrlHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Write(json)
 }
-
