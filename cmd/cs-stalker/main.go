@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	// "github.com/finnbechinka/cs-stalker/internal/api"
+	"github.com/finnbechinka/cs-stalker/internal/db"
 	"github.com/finnbechinka/cs-stalker/internal/routes"
 	"github.com/joho/godotenv"
 )
@@ -47,6 +48,8 @@ func main() {
 	} else {
 		log.Panicf("no leetify auth token env var set")
 	}
+
+	db.Connect()
 
 	router := loggingMiddleware(routes.NewRouter())
 	port := ":8085"
