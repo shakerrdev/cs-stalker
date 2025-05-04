@@ -11,7 +11,7 @@ type Match struct {
 	gorm.Model
 
 	UUID       datatypes.UUID `gorm:"type:uuid;default:uuid_generate_v4();uniqueIndex"`
-	Map        string         `gorm:"size:64"`
+	Map        string         `gorm:"size:64;not null"`
 	MatchType  string         `gorm:"size:32"` // "competitive", "wingman", etc.
 	Team1Score int
 	Team2Score int

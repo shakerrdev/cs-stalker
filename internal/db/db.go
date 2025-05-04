@@ -5,11 +5,10 @@ import (
 	"log"
 	"os"
 
+	"github.com/finnbechinka/cs-stalker/internal/db/models"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-
-	"github.com/finnbechinka/cs-stalker/internal/db/models"
 )
 
 var DB *gorm.DB
@@ -56,19 +55,28 @@ func Connect() {
 	}
 
 	// Run AutoMigrate to update the schema
-	err = DB.AutoMigrate(
-		models.Player{},
-		models.SteamProfile{},
-		models.FaceitProfile{},
-		models.LeetifyProfile{},
-		models.Match{},
-		models.MatchPlayer{},
-		models.MatchTeam{},
-		models.LeetifyMatch{},
-		models.LeetifyPlayerMatchStats{},
-	)
-	if err != nil {
-		log.Fatalf("failed to auto migrate: %v", err)
+	models := []interface{}{
+		&models.Player{},
+		&models.SteamProfile{},
+		&models.FaceitProfile{},
+		&models.LeetifyProfile{},
+		&models.Match{},
+		&models.MatchTeam{},
+		&models.MatchPlayer{},
+		&models.LeetifyMatch{},
+		&models.LeetifyPlayerMatchStats{},
+	}
+
+	migration_error := false
+
+	for _, model := range models {
+		if err := DB.AutoMigrate(model); err != nil {
+			log.Printf("failed to migrate %T: %v", model, err)
+			migration_error = true
+		}
+	}
+	if migration_error {
+		log.Fatalf("failed to auto migrate")
 	} else {
 		log.Println("auto migrated database")
 	}

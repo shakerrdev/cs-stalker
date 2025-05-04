@@ -5,8 +5,8 @@ import "gorm.io/gorm"
 type LeetifyPlayerMatchStats struct {
 	gorm.Model
 
-	MatchPlayerID uint   // References MatchPlayer
-	LeetifyUserID string `gorm:"size:64"`
+	MatchPlayerID uint   `gorm:"index"`
+	LeetifyUserID string `gorm:"size:64;index"`
 
 	// Ratings
 	LeetifyRating             float64

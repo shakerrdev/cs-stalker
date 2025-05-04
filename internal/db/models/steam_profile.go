@@ -5,8 +5,8 @@ import "gorm.io/gorm"
 type SteamProfile struct {
 	gorm.Model
 
-	PlayerID        uint `gorm:"uniqueIndex"`
-	SteamName       string
-	AvatarURL       string
+	PlayerID        uint   `gorm:"index;uniqueIndex;not null"`
+	SteamName       string `gorm:"size:128"`
+	AvatarURL       string `gorm:"size:256"`
 	IsProfilePublic bool
 }

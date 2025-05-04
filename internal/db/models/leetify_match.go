@@ -9,11 +9,11 @@ import (
 type LeetifyMatch struct {
 	gorm.Model
 
-	MatchID     uint   `gorm:"uniqueIndex"`
-	LeetifyID   string `gorm:"size:64"`
+	MatchID     uint   `gorm:"uniqueIndex;not null"`
+	LeetifyID   string `gorm:"size:64;index"`
 	CreatedAt   time.Time
-	Status      string `gorm:"size:32"`
-	DataSource  string `gorm:"size:32"` // "matchmaking", "faceit", etc.
+	Status      string `gorm:"size:32;not null"`
+	DataSource  string `gorm:"size:32"`
 	Recalculate bool
 
 	// Relationship
