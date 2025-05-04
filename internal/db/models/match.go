@@ -1,10 +1,10 @@
 package models
 
 import (
-	"time"
-
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
+
+	"github.com/finnbechinka/cs-stalker/internal/db/models/leetify"
 )
 
 type Match struct {
@@ -13,15 +13,12 @@ type Match struct {
 	UUID       datatypes.UUID `gorm:"type:uuid;default:uuid_generate_v4();uniqueIndex"`
 	Map        string         `gorm:"size:64;not null"`
 	MatchType  string         `gorm:"size:32"` // "competitive", "wingman", etc.
-	Team1Score int
-	Team2Score int
-	IsCS2      bool
+	ScoreTeam1 int
+	ScoreTeam2 int
+	MatchDate  string
 	Duration   int // in seconds
-	FinishedAt time.Time
-	// TODO?: Hasbanned player or/and replay / share code
+	// TODO?: Hasbanned player or/and replay / share code, iscs2?
 
 	// Relationships
-	Teams       []MatchTeam
-	Players     []MatchPlayer
-	LeetifyData *LeetifyMatch `gorm:"foreignKey:MatchID"`
+	LeetifyMatch leetify.LeetifyMatch
 }

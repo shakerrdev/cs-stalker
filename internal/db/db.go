@@ -6,6 +6,9 @@ import (
 	"os"
 
 	"github.com/finnbechinka/cs-stalker/internal/db/models"
+	"github.com/finnbechinka/cs-stalker/internal/db/models/faceit"
+	"github.com/finnbechinka/cs-stalker/internal/db/models/leetify"
+	"github.com/finnbechinka/cs-stalker/internal/db/models/steam"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -57,14 +60,24 @@ func Connect() {
 	// Run AutoMigrate to update the schema
 	models := []interface{}{
 		&models.Player{},
-		&models.SteamProfile{},
-		&models.FaceitProfile{},
-		&models.LeetifyProfile{},
 		&models.Match{},
-		&models.MatchTeam{},
-		&models.MatchPlayer{},
-		&models.LeetifyMatch{},
-		&models.LeetifyPlayerMatchStats{},
+
+		// Leetify models
+		&leetify.LeetifyProfile{},
+		&leetify.LeetifyClub{},
+		&leetify.LeetifyTeammate{},
+		&leetify.LeetifyRank{},
+		&leetify.LeetifyHighlight{},
+		&leetify.LeetifyPersonalBest{},
+		&leetify.LeetifyMatch{},
+		&leetify.LeetifyMatchDetails{},
+		&leetify.LeetifyPlayerStats{},
+		&leetify.LeetifyAgent{},
+		&leetify.LeetifyParty{},
+
+		// Other services
+		&faceit.FaceitProfile{},
+		&steam.SteamProfile{},
 	}
 
 	migration_error := false

@@ -1,17 +1,22 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"github.com/finnbechinka/cs-stalker/internal/db/models/faceit"
+	"github.com/finnbechinka/cs-stalker/internal/db/models/leetify"
+	"github.com/finnbechinka/cs-stalker/internal/db/models/steam"
+	"gorm.io/gorm"
+)
 
 type Player struct {
 	gorm.Model
 
-	SteamID64    string   `gorm:"uniqueIndex;not null;size:17"`
-	Name         string   `gorm:"size:128"`
-	AvatarURL    string   `gorm:"size:256"`
-	Region       string   `gorm:"size:64"`
-	PlatformBans []string `gorm:"type:jsonb"`
+	SteamID64 string   `gorm:"uniqueIndex;not null;size:17"`
+	Name      string   `gorm:"size:128"`
+	AvatarURL string   `gorm:"size:256"`
+	Region    string   `gorm:"size:64"`
+	Bans      []string `gorm:"type:jsonb"`
 
-	SteamProfile   SteamProfile
-	FaceitProfile  FaceitProfile
-	LeetifyProfile LeetifyProfile
+	LeetifyProfile leetify.LeetifyProfile
+	FaceitProfile  faceit.FaceitProfile
+	SteamProfile   steam.SteamProfile
 }
