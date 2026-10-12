@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -30,9 +32,8 @@ func loggingMiddleware(next http.Handler) http.Handler {
 func main() {
 	log.Println("cs-stalker started")
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Panicf("main: error loading .env; err: %s", err)
+	if err := godotenv.Load(); err != nil && !errors.Is(err, fs.ErrNotExist) {
+		log.Fatalf("load .env: %v", err)
 	}
 
 	evar, exists := os.LookupEnv("STEAMAPIKEY")

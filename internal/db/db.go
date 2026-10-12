@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/joho/godotenv"
 	"github.com/shakerrdev/cs-stalker/internal/db/models"
 	"github.com/shakerrdev/cs-stalker/internal/db/models/faceit"
 	"github.com/shakerrdev/cs-stalker/internal/db/models/leetify"
@@ -17,12 +16,6 @@ import (
 var DB *gorm.DB
 
 func Connect() {
-	// Load environment variables from .env file
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
-
 	// Retrieve necessary environment variables
 	usr, exists := os.LookupEnv("DB_USER")
 	if !exists {
@@ -50,6 +43,7 @@ func Connect() {
 		host, usr, pw, dbname, port)
 
 	// Open a connection to the database
+	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
