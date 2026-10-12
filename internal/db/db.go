@@ -31,7 +31,12 @@ func DSNFromEnv() (string, error) {
 	}
 
 	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable TimeZone=Europe/Oslo",
-		values["DB_HOST"], values["DB_PORT"], values["DB_USER"], values["DB_PASSWORD"], values["DB_NAME"]), nil
+		quoteDSN(values["DB_HOST"]), quoteDSN(values["DB_PORT"]), quoteDSN(values["DB_USER"]),
+		quoteDSN(values["DB_PASSWORD"]), quoteDSN(values["DB_NAME"])), nil
+}
+
+func quoteDSN(value string) string {
+	return "'" + strings.NewReplacer(`\`, `\\`, `'`, `\'`).Replace(value) + "'"
 }
 
 func Connect(dsn string) error {
