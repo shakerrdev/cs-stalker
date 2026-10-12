@@ -8,7 +8,7 @@ import (
 
 type LeetifyProfile struct {
 	gorm.Model
-	PlayerID       uint   `gorm:"index;uniqueIndex"`
+	PlayerID       uint   `gorm:"uniqueIndex"`
 	LeetifyUserID  string `gorm:"uniqueIndex"`
 	Steam64ID      string `gorm:"uniqueIndex;size:17"`
 	Name           string

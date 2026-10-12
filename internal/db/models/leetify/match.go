@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type LeetifyMatch struct {
 	gorm.Model
-	MatchID        uint   `gorm:"index;uniqueIndex;not null"`
+	MatchID        uint   `gorm:"uniqueIndex;not null"`
 	LeetifyID      string `gorm:"uniqueIndex"`
 	DataSource     string
 	IsCS2          bool
