@@ -23,6 +23,7 @@ var funcs = template.FuncMap{
 	"decimal":        decimal,
 	"hours":          hours,
 	"date":           shortDate,
+	"dayMonth":       dayMonth,
 	"monthYear":      monthYear,
 	"ago":            ago,
 	"mapName":        mapName,
@@ -88,7 +89,7 @@ func derefFloat(v *float64) float64 {
 }
 
 func signed(v float64) string {
-	return fmt.Sprintf("%+.2f", v)
+	return strings.Replace(fmt.Sprintf("%+.2f", v), "-", "\u2212", 1)
 }
 
 func rating100(v float64) string {
@@ -122,6 +123,13 @@ func hours(minutes int) string {
 }
 
 func shortDate(t time.Time) string {
+	return t.Format("2 Jan 2006")
+}
+
+func dayMonth(t time.Time) string {
+	if t.Year() == now().Year() {
+		return t.Format("2 Jan")
+	}
 	return t.Format("2 Jan 2006")
 }
 

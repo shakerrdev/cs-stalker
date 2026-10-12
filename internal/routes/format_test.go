@@ -38,9 +38,9 @@ func TestPremier(t *testing.T) {
 func TestNumberFormats(t *testing.T) {
 	tests := []struct{ got, want string }{
 		{signed(1.5699999999999998), "+1.57"},
-		{signed(-0.4), "-0.40"},
+		{signed(-0.4), "\u22120.40"},
 		{rating100(0.0065), "+0.65"},
-		{rating100(-0.0318), "-3.18"},
+		{rating100(-0.0318), "\u22123.18"},
 		{points100(0.104), "10.4"},
 		{percent(28.3531), "28%"},
 		{fraction(0.7037), "70%"},
@@ -64,6 +64,13 @@ func TestAgo(t *testing.T) {
 	fixed := time.Date(2026, 10, 12, 20, 0, 0, 0, time.UTC)
 	now = func() time.Time { return fixed }
 	t.Cleanup(func() { now = time.Now })
+
+	if got := dayMonth(time.Date(2026, 3, 4, 0, 0, 0, 0, time.UTC)); got != "4 Mar" {
+		t.Errorf("dayMonth this year = %q", got)
+	}
+	if got := dayMonth(time.Date(2025, 12, 30, 0, 0, 0, 0, time.UTC)); got != "30 Dec 2025" {
+		t.Errorf("dayMonth last year = %q", got)
+	}
 
 	tests := map[time.Duration]string{
 		3 * time.Hour:        "today",
