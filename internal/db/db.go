@@ -16,6 +16,10 @@ import (
 var DB *gorm.DB
 
 func DSNFromEnv() (string, error) {
+	if url := os.Getenv("DATABASE_URL"); url != "" {
+		return url, nil
+	}
+
 	keys := []string{"DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME"}
 	values := make(map[string]string, len(keys))
 	var missing []string

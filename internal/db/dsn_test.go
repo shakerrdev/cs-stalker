@@ -9,6 +9,7 @@ import (
 
 func setDBEnv(t *testing.T) {
 	t.Helper()
+	t.Setenv("DATABASE_URL", "")
 	t.Setenv("DB_HOST", "localhost")
 	t.Setenv("DB_PORT", "5432")
 	t.Setenv("DB_USER", "postgres")
@@ -42,5 +43,19 @@ func TestDSNFromEnv_Missing(t *testing.T) {
 
 	if _, err := DSNFromEnv(); err == nil {
 		t.Fatal("expected an error for missing DB_NAME")
+	}
+}
+
+func TestDSNFromEnv_DatabaseURLWins(t *testing.T) {
+	setDBEnv(t)
+	url := "postgres://app:secret@db.example.com/cs?sslmode=require"
+	t.Setenv("DATABASE_URL", url)
+
+	dsn, err := DSNFromEnv()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if dsn != url {
+		t.Errorf("dsn = %q, want DATABASE_URL", dsn)
 	}
 }
