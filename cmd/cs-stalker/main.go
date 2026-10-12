@@ -42,7 +42,14 @@ func main() {
 		}
 	}
 
-	db.Connect()
+	dsn, err := db.DSNFromEnv()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := db.Connect(dsn); err != nil {
+		log.Fatal(err)
+	}
+	log.Println("connected to database")
 
 	router := loggingMiddleware(routes.NewRouter())
 	port := ":8085"

@@ -2,8 +2,8 @@ package db
 
 import (
 	"fmt"
-	"log"
 	"os"
+	"strings"
 
 	"github.com/shakerrdev/cs-stalker/internal/db/models"
 	"github.com/shakerrdev/cs-stalker/internal/db/models/faceit"
@@ -15,48 +15,43 @@ import (
 
 var DB *gorm.DB
 
-func Connect() {
-	// Retrieve necessary environment variables
-	usr, exists := os.LookupEnv("DB_USER")
-	if !exists {
-		log.Fatalf("missing environment variable: DB_USER")
+func DSNFromEnv() (string, error) {
+	keys := []string{"DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME"}
+	values := make(map[string]string, len(keys))
+	var missing []string
+	for _, key := range keys {
+		value, ok := os.LookupEnv(key)
+		if !ok {
+			missing = append(missing, key)
+		}
+		values[key] = value
 	}
-	pw, exists := os.LookupEnv("DB_PASSWORD")
-	if !exists {
-		log.Fatalf("missing environment variable: DB_PASSWORD")
-	}
-	host, exists := os.LookupEnv("DB_HOST")
-	if !exists {
-		log.Fatalf("missing environment variable: DB_HOST")
-	}
-	port, exists := os.LookupEnv("DB_PORT")
-	if !exists {
-		log.Fatalf("missing environment variable: DB_PORT")
-	}
-	dbname, exists := os.LookupEnv("DB_NAME")
-	if !exists {
-		log.Fatalf("missing environment variable: DB_NAME")
+	if len(missing) > 0 {
+		return "", fmt.Errorf("missing environment variables: %s", strings.Join(missing, ", "))
 	}
 
-	// Construct the database connection string
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Europe/Oslo",
-		host, usr, pw, dbname, port)
+	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable TimeZone=Europe/Oslo",
+		values["DB_HOST"], values["DB_PORT"], values["DB_USER"], values["DB_PASSWORD"], values["DB_NAME"]), nil
+}
 
-	// Open a connection to the database
-	var err error
-	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+func Connect(dsn string) error {
+	conn, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
-	} else {
-		log.Println("connected to database")
+		return fmt.Errorf("connect to database: %w", err)
 	}
+	if err := Migrate(conn); err != nil {
+		return err
+	}
+	DB = conn
+	return nil
+}
 
-	// Run AutoMigrate to update the schema
-	models := []interface{}{
+func Migrate(conn *gorm.DB) error {
+	err := conn.AutoMigrate(
 		&models.Player{},
 		&models.Match{},
-
-		// Leetify models
+		&steam.SteamProfile{},
+		&faceit.FaceitProfile{},
 		&leetify.LeetifyProfile{},
 		&leetify.LeetifyClub{},
 		&leetify.LeetifyTeammate{},
@@ -68,23 +63,9 @@ func Connect() {
 		&leetify.LeetifyPlayerStats{},
 		&leetify.LeetifyAgent{},
 		&leetify.LeetifyParty{},
-
-		// Other services
-		&faceit.FaceitProfile{},
-		&steam.SteamProfile{},
+	)
+	if err != nil {
+		return fmt.Errorf("migrate database: %w", err)
 	}
-
-	migration_error := false
-
-	for _, model := range models {
-		if err := DB.AutoMigrate(model); err != nil {
-			log.Printf("failed to migrate %T: %v", model, err)
-			migration_error = true
-		}
-	}
-	if migration_error {
-		log.Fatalf("failed to auto migrate")
-	} else {
-		log.Println("auto migrated database")
-	}
+	return nil
 }
