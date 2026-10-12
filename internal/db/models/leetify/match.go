@@ -1,6 +1,10 @@
 package leetify
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type LeetifyMatch struct {
 	gorm.Model
@@ -11,7 +15,7 @@ type LeetifyMatch struct {
 	MapName        string
 	Team1Score     int
 	Team2Score     int
-	FinishedAt     string
+	FinishedAt     time.Time
 	Status         string
 	SteamShareCode string
 

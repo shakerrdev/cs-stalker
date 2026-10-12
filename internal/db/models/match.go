@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 
 	"github.com/shakerrdev/cs-stalker/internal/db/models/leetify"
@@ -14,7 +16,7 @@ type Match struct {
 	MatchType  string `gorm:"size:32"` // "competitive", "wingman", etc.
 	ScoreTeam1 int
 	ScoreTeam2 int
-	MatchDate  string
+	MatchDate  time.Time
 	Duration   int // in seconds
 	// TODO?: Hasbanned player or/and replay / share code, iscs2?
 
