@@ -68,7 +68,7 @@ func resolveVanityUrl(vanityUrl string) (string, error) {
 		return "", fmt.Errorf("ResolveVanityUrl: %w", err)
 	}
 	if body.Response.Success != 1 {
-		return "", fmt.Errorf("ResolveVanityUrl: no steam id found for %q", vanityUrl)
+		return "", fmt.Errorf("ResolveVanityUrl: %q: %w", vanityUrl, ErrNotFound)
 	}
 	return body.Response.SteamID, nil
 }
@@ -83,7 +83,7 @@ func ResolveUrl(input string) (string, error) {
 	input = strings.TrimSpace(input)
 	switch {
 	case input == "":
-		return "", fmt.Errorf("ResolveUrl: empty input")
+		return "", fmt.Errorf("ResolveUrl: empty input: %w", ErrNotFound)
 	case steam64Pattern.MatchString(input):
 		return input, nil
 	case !strings.Contains(input, "/"):
@@ -104,7 +104,7 @@ func ResolveUrl(input string) (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("ResolveUrl: not a steam profile url: %q", input)
+	return "", fmt.Errorf("ResolveUrl: not a steam profile url %q: %w", input, ErrNotFound)
 }
 
 func PlayerSummaries(steam64ids []string) (map[string]Summary, error) {

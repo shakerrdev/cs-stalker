@@ -40,8 +40,8 @@ func TestResolveVanityUrl_Failure(t *testing.T) {
 	steamResponds(t, mockResp)
 
 	_, err := resolveVanityUrl("unknown_user")
-	if err == nil {
-		t.Fatal("expected error, got none")
+	if !errors.Is(err, ErrNotFound) {
+		t.Fatalf("err = %v, want ErrNotFound", err)
 	}
 }
 
@@ -237,8 +237,8 @@ func TestResolveUrl_Invalid(t *testing.T) {
 		"https://steamcommunity.com/groups/somegroup",
 		"https://example.com/",
 	} {
-		if got, err := ResolveUrl(input); err == nil {
-			t.Errorf("ResolveUrl(%q) = %q, want an error", input, got)
+		if got, err := ResolveUrl(input); !errors.Is(err, ErrNotFound) {
+			t.Errorf("ResolveUrl(%q) = %q, %v; want ErrNotFound", input, got, err)
 		}
 	}
 }
