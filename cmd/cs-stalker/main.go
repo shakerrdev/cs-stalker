@@ -60,6 +60,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	if password := os.Getenv("SITE_PASSWORD"); password != "" {
+		router = routes.RequirePassword(password, router)
+	} else {
+		log.Println("SITE_PASSWORD not set, the site is open to everyone")
+	}
 
 	port := os.Getenv("PORT")
 	if port == "" {
