@@ -124,31 +124,36 @@ func TestPlayerSummaries_BatchesOf100(t *testing.T) {
 	}
 }
 
-func TestUserPlaytime(t *testing.T) {
+func TestCSPlaytime(t *testing.T) {
 	t.Setenv("STEAMAPIKEY", "mock")
 	useSteamServer(t, func(w http.ResponseWriter, r *http.Request) {
 		if !strings.Contains(r.URL.Path, "GetOwnedGames") || r.URL.Query().Get("include_played_free_games") != "1" {
 			t.Errorf("unexpected request %s", r.URL)
 		}
-		io.WriteString(w, `{"response":{"games":[{"appid":10,"playtime_forever":30},{"appid":730,"playtime_forever":120}]}}`)
+		io.WriteString(w, `{"response":{"games":[{"appid":10,"playtime_forever":30},{"appid":730,"playtime_forever":12345,"playtime_2weeks":600,"rtime_last_played":1760000000}]}}`)
 	})
 
-	hours, err := UserPlaytime("76561198056395137")
+	playtime, err := CSPlaytime("76561198056395137")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if hours != 2 {
-		t.Errorf("expected 2 hours, got %d", hours)
+	want := Playtime{TotalMinutes: 12345, RecentMinutes: 600, LastPlayed: time.Unix(1760000000, 0).UTC()}
+	if playtime != want {
+		t.Errorf("playtime = %+v, want %+v", playtime, want)
 	}
 }
 
-func TestUserPlaytime_NotFound(t *testing.T) {
-	mockResp := `{"response":{"games":[{"appid":999,"playtime_forever":200}]}}`
-	steamResponds(t, mockResp)
+func TestCSPlaytime_NeverPlayed(t *testing.T) {
+	steamResponds(t, `{"response":{"game_count":1,"games":[{"appid":999,"playtime_forever":200}]}}`)
+	if _, err := CSPlaytime("76561198056395137"); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("err = %v, want ErrNotFound", err)
+	}
+}
 
-	_, err := UserPlaytime("76561198056395137")
-	if err == nil {
-		t.Fatal("expected error, got none")
+func TestCSPlaytime_Hidden(t *testing.T) {
+	steamResponds(t, `{"response":{}}`)
+	if _, err := CSPlaytime("76561198056395137"); !errors.Is(err, ErrHidden) {
+		t.Fatalf("err = %v, want ErrHidden", err)
 	}
 }
 

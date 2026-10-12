@@ -165,26 +165,42 @@ func UserSummary(steam64id string) (Summary, error) {
 	return summary, nil
 }
 
-func UserPlaytime(steam64id string) (int32, error) {
+type Playtime struct {
+	TotalMinutes  int
+	RecentMinutes int
+	LastPlayed    time.Time
+}
+
+func CSPlaytime(steam64id string) (Playtime, error) {
 	var body struct {
 		Response struct {
 			Games []struct {
-				AppID           int `json:"appid"`
-				PlaytimeForever int `json:"playtime_forever"`
+				AppID           int   `json:"appid"`
+				PlaytimeForever int   `json:"playtime_forever"`
+				Playtime2Weeks  int   `json:"playtime_2weeks"`
+				LastPlayed      int64 `json:"rtime_last_played"`
 			} `json:"games"`
 		} `json:"response"`
 	}
 	params := url.Values{"steamid": {steam64id}, "include_played_free_games": {"1"}}
 	if err := steamGet("IPlayerService/GetOwnedGames/v1", params, &body); err != nil {
-		return 0, fmt.Errorf("UserPlaytime: %w", err)
+		return Playtime{}, fmt.Errorf("CSPlaytime: %w", err)
+	}
+	if len(body.Response.Games) == 0 {
+		return Playtime{}, fmt.Errorf("CSPlaytime: %s: %w", steam64id, ErrHidden)
 	}
 
 	for _, game := range body.Response.Games {
-		if game.AppID == 730 {
-			return int32(game.PlaytimeForever / 60), nil
+		if game.AppID != 730 {
+			continue
 		}
+		playtime := Playtime{TotalMinutes: game.PlaytimeForever, RecentMinutes: game.Playtime2Weeks}
+		if game.LastPlayed > 0 {
+			playtime.LastPlayed = time.Unix(game.LastPlayed, 0).UTC()
+		}
+		return playtime, nil
 	}
-	return 0, fmt.Errorf("UserPlaytime: no cs playtime found for %s", steam64id)
+	return Playtime{}, fmt.Errorf("CSPlaytime: %s: %w", steam64id, ErrNotFound)
 }
 
 type Bans struct {
