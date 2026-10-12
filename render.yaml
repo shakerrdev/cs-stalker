@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: cs-stalker
+    runtime: go
+    plan: free
+    region: frankfurt
+    branch: main
+    buildCommand: go build -tags netgo -ldflags '-s -w' -o app ./cmd/cs-stalker
+    startCommand: ./app
+    healthCheckPath: /
+    envVars:
+      - key: STEAMAPIKEY
+        sync: false
