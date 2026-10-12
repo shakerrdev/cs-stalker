@@ -13,7 +13,10 @@ import (
 	"time"
 )
 
-var ErrNotFound = errors.New("not found")
+var (
+	ErrNotFound = errors.New("not found")
+	ErrHidden   = errors.New("hidden by privacy settings")
+)
 
 type Summary struct {
 	Steam64id    string
@@ -224,4 +227,19 @@ func PlayerBans(steam64id string) (Bans, error) {
 		bans.TradeBan = player.EconomyBan
 	}
 	return bans, nil
+}
+
+func SteamLevel(steam64id string) (int, error) {
+	var body struct {
+		Response struct {
+			PlayerLevel *int `json:"player_level"`
+		} `json:"response"`
+	}
+	if err := steamGet("IPlayerService/GetSteamLevel/v1", url.Values{"steamid": {steam64id}}, &body); err != nil {
+		return 0, fmt.Errorf("SteamLevel: %w", err)
+	}
+	if body.Response.PlayerLevel == nil {
+		return 0, fmt.Errorf("SteamLevel: %s: %w", steam64id, ErrHidden)
+	}
+	return *body.Response.PlayerLevel, nil
 }

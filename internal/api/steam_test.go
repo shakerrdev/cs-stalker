@@ -262,3 +262,17 @@ func TestPlayerBans(t *testing.T) {
 		})
 	}
 }
+
+func TestSteamLevel(t *testing.T) {
+	steamResponds(t, `{"response":{"player_level":42}}`)
+	if level, err := SteamLevel("76561198056395137"); err != nil || level != 42 {
+		t.Errorf("SteamLevel = %d, %v; want 42", level, err)
+	}
+}
+
+func TestSteamLevel_Hidden(t *testing.T) {
+	steamResponds(t, `{"response":{}}`)
+	if _, err := SteamLevel("76561198056395137"); !errors.Is(err, ErrHidden) {
+		t.Errorf("err = %v, want ErrHidden", err)
+	}
+}
