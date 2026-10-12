@@ -36,10 +36,11 @@ func main() {
 		log.Fatalf("load .env: %v", err)
 	}
 
-	for _, key := range []string{"STEAMAPIKEY", "LEETIFY_AUTH_TOKEN"} {
-		if os.Getenv(key) == "" {
-			log.Fatalf("missing environment variable: %s", key)
-		}
+	if os.Getenv("STEAMAPIKEY") == "" {
+		log.Fatal("missing environment variable: STEAMAPIKEY")
+	}
+	if os.Getenv("LEETIFY_AUTH_TOKEN") == "" {
+		log.Println("LEETIFY_AUTH_TOKEN not set, leetify lookups will fail")
 	}
 
 	dsn, err := db.DSNFromEnv()
