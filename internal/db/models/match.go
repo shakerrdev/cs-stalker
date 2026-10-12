@@ -1,7 +1,6 @@
 package models
 
 import (
-	"gorm.io/datatypes"
 	"gorm.io/gorm"
 
 	"github.com/finnbechinka/cs-stalker/internal/db/models/leetify"
@@ -10,9 +9,9 @@ import (
 type Match struct {
 	gorm.Model
 
-	UUID       datatypes.UUID `gorm:"type:uuid;default:uuid_generate_v4();uniqueIndex"`
-	Map        string         `gorm:"size:64;not null"`
-	MatchType  string         `gorm:"size:32"` // "competitive", "wingman", etc.
+	UUID       string `gorm:"type:uuid;default:gen_random_uuid();uniqueIndex"`
+	Map        string `gorm:"size:64;not null"`
+	MatchType  string `gorm:"size:32"` // "competitive", "wingman", etc.
 	ScoreTeam1 int
 	ScoreTeam2 int
 	MatchDate  string
