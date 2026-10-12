@@ -22,6 +22,7 @@ go run ./cmd/cs-stalker
 | `DATABASE_URL` | Optional. Postgres connection string, e.g. `postgres://user:pass@host/db?sslmode=require` |
 | `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` | Optional. Postgres connection in parts (all or none), used when `DATABASE_URL` is unset |
 | `PORT` | Optional. Port to listen on, default 8085 |
+| `SITE_PASSWORD` | Optional. When set, the browser asks for this password before showing anything (any user name works); `/healthz` stays open |
 
 Variables already set in the environment take precedence over `.env`, and the file is optional.
 
@@ -32,7 +33,7 @@ Variables already set in the environment take precedence over `.env`, and the fi
 1. Open https://render.com/deploy?repo=https://github.com/shakerrdev/cs-stalker and sign in with GitHub.
 2. Enter your `STEAMAPIKEY` when asked and apply the blueprint.
 
-The service runs without a database. To add one, create a free Postgres project on [Neon](https://neon.com), copy its connection string and add it as `DATABASE_URL` in the service's Environment settings; the tables are created on the next start. `LEETIFY_AUTH_TOKEN` can be added there too.
+The service runs without a database. To add one, create a free Postgres project on [Neon](https://neon.com), copy its connection string and add it as `DATABASE_URL` in the service's Environment settings; the tables are created on the next start. `LEETIFY_AUTH_TOKEN` can be added there too, and `SITE_PASSWORD` to keep the site to yourself.
 
 Free Render services go to sleep after a while without visits, so the first request after a break takes noticeably longer.
 
