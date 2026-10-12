@@ -33,7 +33,7 @@ type LeetifyProfile struct {
 type LeetifyClub struct {
 	gorm.Model
 	LeetifyProfileID uint
-	ID               string
+	ClubID           string `gorm:"index"`
 	Name             string
 	Tag              string
 }
