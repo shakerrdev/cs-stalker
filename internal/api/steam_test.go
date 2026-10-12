@@ -1,8 +1,14 @@
 package api
 
 import (
+	"bytes"
+	"errors"
 	"io"
+	"log"
 	"net/http"
+	"net/url"
+	"os"
+	"strings"
 	"testing"
 )
 
@@ -83,5 +89,48 @@ func TestUserPlaytime_NotFound(t *testing.T) {
 	_, err := UserPlaytime("76561198056395137")
 	if err == nil {
 		t.Fatal("expected error, got none")
+	}
+}
+
+func TestSteamRequestEscapesParams(t *testing.T) {
+	t.Setenv("STEAMAPIKEY", "secret-key")
+	var query url.Values
+	useSteamServer(t, func(w http.ResponseWriter, r *http.Request) {
+		query = r.URL.Query()
+		io.WriteString(w, `{"response":{"steamid":"76561198056395137","success":1}}`)
+	})
+
+	if _, err := resolveVanityUrl("name&key=other"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got := query.Get("vanityurl"); got != "name&key=other" {
+		t.Errorf("vanityurl = %q", got)
+	}
+	if got := query["key"]; len(got) != 1 || got[0] != "secret-key" {
+		t.Errorf("key = %q", got)
+	}
+}
+
+func TestSteamRequestKeepsKeyOutOfLogsAndErrors(t *testing.T) {
+	t.Setenv("STEAMAPIKEY", "secret-key")
+	previous := steamClient
+	steamClient = &http.Client{Transport: roundTripperFunc(func(*http.Request) (*http.Response, error) {
+		return nil, errors.New("connection refused")
+	})}
+	t.Cleanup(func() { steamClient = previous })
+
+	var logs bytes.Buffer
+	log.SetOutput(&logs)
+	t.Cleanup(func() { log.SetOutput(os.Stderr) })
+
+	_, err := UserSummary("76561198056395137")
+	if err == nil {
+		t.Fatal("expected error, got none")
+	}
+	if strings.Contains(err.Error(), "secret-key") {
+		t.Errorf("error leaks api key: %v", err)
+	}
+	if strings.Contains(logs.String(), "secret-key") {
+		t.Errorf("log leaks api key: %s", logs.String())
 	}
 }
