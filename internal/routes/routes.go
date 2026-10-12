@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/finnbechinka/cs-stalker/internal/api"
+	"github.com/shakerrdev/cs-stalker/internal/api"
 )
 
 func NewRouter() http.Handler {

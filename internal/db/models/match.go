@@ -3,7 +3,7 @@ package models
 import (
 	"gorm.io/gorm"
 
-	"github.com/finnbechinka/cs-stalker/internal/db/models/leetify"
+	"github.com/shakerrdev/cs-stalker/internal/db/models/leetify"
 )
 
 type Match struct {

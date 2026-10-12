@@ -1,9 +1,9 @@
 package models
 
 import (
-	"github.com/finnbechinka/cs-stalker/internal/db/models/faceit"
-	"github.com/finnbechinka/cs-stalker/internal/db/models/leetify"
-	"github.com/finnbechinka/cs-stalker/internal/db/models/steam"
+	"github.com/shakerrdev/cs-stalker/internal/db/models/faceit"
+	"github.com/shakerrdev/cs-stalker/internal/db/models/leetify"
+	"github.com/shakerrdev/cs-stalker/internal/db/models/steam"
 	"gorm.io/gorm"
 )
 

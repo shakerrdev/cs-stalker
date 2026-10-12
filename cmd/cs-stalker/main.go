@@ -7,10 +7,10 @@ import (
 	"os"
 	"strings"
 
-	// "github.com/finnbechinka/cs-stalker/internal/api"
-	"github.com/finnbechinka/cs-stalker/internal/db"
-	"github.com/finnbechinka/cs-stalker/internal/routes"
+	// "github.com/shakerrdev/cs-stalker/internal/api"
 	"github.com/joho/godotenv"
+	"github.com/shakerrdev/cs-stalker/internal/db"
+	"github.com/shakerrdev/cs-stalker/internal/routes"
 )
 
 func loggingMiddleware(next http.Handler) http.Handler {

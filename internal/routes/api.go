@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/finnbechinka/cs-stalker/internal/api"
+	"github.com/shakerrdev/cs-stalker/internal/api"
 )
 
 func apiRootHandler(w http.ResponseWriter, r *http.Request) {

@@ -5,11 +5,11 @@ import (
 	"log"
 	"os"
 
-	"github.com/finnbechinka/cs-stalker/internal/db/models"
-	"github.com/finnbechinka/cs-stalker/internal/db/models/faceit"
-	"github.com/finnbechinka/cs-stalker/internal/db/models/leetify"
-	"github.com/finnbechinka/cs-stalker/internal/db/models/steam"
 	"github.com/joho/godotenv"
+	"github.com/shakerrdev/cs-stalker/internal/db/models"
+	"github.com/shakerrdev/cs-stalker/internal/db/models/faceit"
+	"github.com/shakerrdev/cs-stalker/internal/db/models/leetify"
+	"github.com/shakerrdev/cs-stalker/internal/db/models/steam"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

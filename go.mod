@@ -1,4 +1,4 @@
-module github.com/finnbechinka/cs-stalker
+module github.com/shakerrdev/cs-stalker
 
 go 1.24
 
