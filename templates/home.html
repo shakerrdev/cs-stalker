@@ -1,0 +1,14 @@
+{{define "main"}}
+<section class="lookup">
+  <h1>Who's in your lobby?</h1>
+  <p class="lede">Paste someone's Steam profile to see their bans, ranks and how they play.</p>
+  {{template "searchForm" .Query}}
+  {{with .Error}}<p class="error" role="alert">{{.}}</p>{{end}}
+  <p class="hint">Works with a profile link like steamcommunity.com/id/name or steamcommunity.com/profiles/7656…, a custom URL name, or the 17-digit Steam64 ID.</p>
+</section>
+{{if .Banana}}
+<section class="banana-reveal" aria-label="Banana">
+  {{template "minion.html"}}
+</section>
+{{end}}
+{{end}}

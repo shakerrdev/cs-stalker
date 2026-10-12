@@ -1,0 +1,35 @@
+{{define "layout"}}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{block "title" .}}cs-stalker{{end}}</title>
+  <link rel="preload" href="/static/fonts/saira.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/static/index.css">
+</head>
+<body>
+  <header class="site-head">
+    <a class="wordmark" href="/">cs-stalker</a>
+    {{block "headerSearch" .}}{{end}}
+  </header>
+  <main>
+    {{template "main" .}}
+  </main>
+  <footer class="site-foot">
+    <p>Data from Steam and Leetify. Not affiliated with Valve or Leetify.</p>
+    <p class="foot-links">
+      <a href="https://moon2.tv/">moon</a>
+      <a class="banana-link" href="/banana" title="Banana" aria-label="Banana">🍌</a>
+    </p>
+  </footer>
+</body>
+</html>
+{{end}}
+
+{{define "searchForm"}}
+<form class="search" action="/lookup" method="get" role="search">
+  <label class="visually-hidden" for="q">Steam profile</label>
+  <input id="q" name="q" type="search" value="{{.}}" placeholder="Steam profile link or ID" autocomplete="off" autocapitalize="off" spellcheck="false" required>
+  <button type="submit">Look up</button>
+</form>
+{{end}}

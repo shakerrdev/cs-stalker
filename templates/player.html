@@ -1,0 +1,200 @@
+{{define "title"}}{{.Summary.Name}} – cs-stalker{{end}}
+
+{{define "headerSearch"}}{{template "searchForm" ""}}{{end}}
+
+{{define "main"}}
+<article class="player">
+  <header class="player-head">
+    <img class="avatar" src="{{.Summary.Avatar}}" alt="" width="184" height="184">
+    <div class="identity">
+      {{$presence := presence .Summary.PersonaState .Summary.Game}}
+      <p class="presence presence-{{$presence.Class}}">{{$presence.Label}}</p>
+      <h1 class="name">{{.Summary.Name}}</h1>
+      <ul class="facts">
+        {{with .Summary.CountryCode}}<li><span aria-hidden="true">{{flag .}}</span> {{.}}</li>{{end}}
+        {{if .Level}}<li>Steam level {{.Level}}</li>{{end}}
+        {{if not .Summary.Created.IsZero}}<li>On Steam since {{monthYear .Summary.Created}}</li>{{end}}
+        {{if not .Summary.IsPublic}}<li>Private Steam profile</li>{{end}}
+        <li>Steam64 ID {{.Summary.Steam64id}}</li>
+      </ul>
+      <p class="elsewhere">
+        <a href="{{.Summary.ProfileURL}}" rel="noreferrer">Steam profile</a>
+        <a href="https://leetify.com/app/profile/{{.Summary.Steam64id}}" rel="noreferrer">Leetify</a>
+        <a href="https://csstats.gg/player/{{.Summary.Steam64id}}" rel="noreferrer">csstats.gg</a>
+      </p>
+    </div>
+    {{with .Leetify}}{{with premier (deref .Ranks.Premier)}}
+    <div class="premier tier-{{.Tier}}">
+      <p class="premier-label">Premier rating</p>
+      <p class="premier-plate"><span class="hi">{{.High}}</span><span class="lo">{{.Low}}</span></p>
+    </div>
+    {{end}}{{end}}
+  </header>
+
+  <section class="bans bans-{{.BanState}}" aria-label="Bans">
+    {{if eq .BanState "clean"}}
+    <p>No VAC, game or trade bans on record.</p>
+    {{else if eq .BanState "unknown"}}
+    <p>Couldn't check Steam bans right now.</p>
+    {{end}}
+    {{with .BanLines}}
+    <ul>{{range .}}<li>{{.}}</li>{{end}}</ul>
+    {{end}}
+  </section>
+
+  <div class="columns">
+    <div class="primary">
+      {{with .Leetify}}
+      <section class="block skill" aria-labelledby="skill-h">
+        <h2 id="skill-h">Leetify ratings</h2>
+        <div class="meters">
+          <div class="meter"><span class="meter-label">Aim</span><span class="meter-track"><span class="meter-fill" style="width: {{bar .Rating.Aim}}%"></span></span><span class="meter-value">{{decimal .Rating.Aim 0}}</span></div>
+          <div class="meter"><span class="meter-label">Positioning</span><span class="meter-track"><span class="meter-fill" style="width: {{bar .Rating.Positioning}}%"></span></span><span class="meter-value">{{decimal .Rating.Positioning 0}}</span></div>
+          <div class="meter"><span class="meter-label">Utility</span><span class="meter-track"><span class="meter-fill" style="width: {{bar .Rating.Utility}}%"></span></span><span class="meter-value">{{decimal .Rating.Utility 0}}</span></div>
+        </div>
+        <dl class="pairs pairs-row">
+          <div><dt>Clutch</dt><dd>{{points100 .Rating.Clutch}}</dd></div>
+          <div><dt>Opening duels</dt><dd class="{{if lt .Rating.Opening 0.0}}neg{{else}}pos{{end}}">{{rating100 .Rating.Opening}}</dd></div>
+          <div><dt>CT side</dt><dd class="{{if lt .Rating.CTLeetify 0.0}}neg{{else}}pos{{end}}">{{rating100 .Rating.CTLeetify}}</dd></div>
+          <div><dt>T side</dt><dd class="{{if lt .Rating.TLeetify 0.0}}neg{{else}}pos{{end}}">{{rating100 .Rating.TLeetify}}</dd></div>
+        </dl>
+      </section>
+      {{end}}
+
+      {{if .Leetify}}
+      <section class="block matches" aria-labelledby="matches-h">
+        <h2 id="matches-h">Recent matches</h2>
+        {{with .Matches}}
+        {{template "scoreboard" .}}
+        {{else}}
+        <p class="note">{{if eq .Leetify.PrivacyMode "private"}}Their Leetify profile is private, so recent matches and teammates are hidden.{{else}}No recent matches on Leetify.{{end}}</p>
+        {{end}}
+        {{with .OlderMatches}}
+        <details class="older">
+          <summary>Show {{len .}} older matches</summary>
+          {{template "scoreboard" .}}
+        </details>
+        {{end}}
+      </section>
+
+      {{with .Leetify.Stats}}
+      <section class="block stats" aria-labelledby="stats-h">
+        <h2 id="stats-h">How they play</h2>
+        <div class="stat-groups">
+          <div class="stat-group">
+            <h3>Aim</h3>
+            <dl class="pairs">
+              <div><dt>Headshot accuracy</dt><dd>{{percent .AccuracyHead}}</dd></div>
+              <div><dt>Accuracy once spotted</dt><dd>{{percent .AccuracyEnemySpotted}}</dd></div>
+              <div><dt>Spray accuracy</dt><dd>{{percent .SprayAccuracy}}</dd></div>
+              <div><dt>Counter-strafed shots</dt><dd>{{percent .CounterStrafingGoodShots}}</dd></div>
+              <div><dt>Reaction time</dt><dd>{{decimal .ReactionTimeMS 0}} ms</dd></div>
+              <div><dt>Crosshair placement</dt><dd>{{decimal .Preaim 1}}°</dd></div>
+            </dl>
+          </div>
+          <div class="stat-group">
+            <h3>Duels and trades</h3>
+            <dl class="pairs">
+              <div><dt>Opening duels won on CT</dt><dd>{{percent .CTOpeningDuelSuccess}}</dd></div>
+              <div><dt>Opening duels won on T</dt><dd>{{percent .TOpeningDuelSuccess}}</dd></div>
+              <div><dt>Trade kills landed</dt><dd>{{percent .TradeKillsSuccess}}</dd></div>
+              <div><dt>Deaths traded by team</dt><dd>{{percent .TradedDeathsSuccess}}</dd></div>
+            </dl>
+          </div>
+          <div class="stat-group">
+            <h3>Utility</h3>
+            <dl class="pairs">
+              <div><dt>Enemies blinded per flash</dt><dd>{{decimal .FlashbangHitFoePerFlashbang 2}}</dd></div>
+              <div><dt>Teammates blinded per flash</dt><dd>{{decimal .FlashbangHitFriendPerFlashbang 2}}</dd></div>
+              <div><dt>Average enemy blind time</dt><dd>{{decimal .FlashbangHitFoeAvgDuration 1}} s</dd></div>
+              <div><dt>HE damage per grenade</dt><dd>{{decimal .HEFoesDamageAvg 1}}</dd></div>
+              <div><dt>Unused utility at death</dt><dd>${{decimal .UtilityOnDeathAvg 0}}</dd></div>
+            </dl>
+          </div>
+        </div>
+      </section>
+      {{end}}
+      {{else}}
+      <section class="block">
+        <p class="note">{{.LeetifyNote}}</p>
+      </section>
+      {{end}}
+    </div>
+
+    <aside class="secondary">
+      {{with .Leetify}}
+      <section class="block" aria-labelledby="ranks-h">
+        <h2 id="ranks-h">Ranks</h2>
+        <dl class="pairs">
+          {{with .Ranks.Leetify}}<div><dt>Leetify rating</dt><dd class="{{if lt (derefFloat .) 0.0}}neg{{else}}pos{{end}}">{{signed (derefFloat .)}}</dd></div>{{end}}
+          {{with deref .Ranks.Faceit}}<div><dt>FACEIT</dt><dd><span class="faceit faceit-{{faceitTier .}}">Level {{.}}</span>{{with deref $.Leetify.Ranks.FaceitElo}} {{thousands .}} Elo{{end}}</dd></div>{{end}}
+          {{with deref .Ranks.Wingman}}<div><dt>Wingman</dt><dd title="{{skillGroupName .}}">{{skillGroup .}}</dd></div>{{end}}
+          <div><dt>Win rate</dt><dd>{{fraction .Winrate}}</dd></div>
+          <div><dt>Matches on Leetify</dt><dd>{{thousands .TotalMatches}}</dd></div>
+          {{with .FirstMatchDate}}<div><dt>First tracked match</dt><dd>{{monthYear .}}</dd></div>{{end}}
+        </dl>
+      </section>
+      {{end}}
+
+      <section class="block" aria-labelledby="time-h">
+        <h2 id="time-h">Time in CS</h2>
+        {{with .Playtime}}
+        <dl class="pairs">
+          <div><dt>Total</dt><dd>{{hours .TotalMinutes}}</dd></div>
+          <div><dt>Last two weeks</dt><dd>{{hours .RecentMinutes}}</dd></div>
+          {{if not .LastPlayed.IsZero}}<div><dt>Last played</dt><dd>{{ago .LastPlayed}}</dd></div>{{end}}
+        </dl>
+        {{else}}
+        <p class="note">{{.PlaytimeNote}}</p>
+        {{end}}
+      </section>
+
+      {{with .Teammates}}
+      <section class="block" aria-labelledby="mates-h">
+        <h2 id="mates-h">Plays with</h2>
+        <ol class="mates">
+          {{range .}}
+          <li>
+            <a href="/player/{{.Steam64ID}}">
+              {{if .Avatar}}<img src="{{.Avatar}}" alt="" width="36" height="36" loading="lazy">{{else}}<span class="avatar-blank"></span>{{end}}
+              <span class="mate-name">{{or .Name .Steam64ID}}</span>
+            </a>
+            <span class="mate-count">{{.Matches}} {{if eq .Matches 1}}match{{else}}matches{{end}}</span>
+          </li>
+          {{end}}
+        </ol>
+      </section>
+      {{end}}
+
+      {{with .MapRanks}}
+      <section class="block" aria-labelledby="maps-h">
+        <h2 id="maps-h">Competitive ranks</h2>
+        <ul class="map-ranks">
+          {{range .}}<li><span>{{mapName .Map}}</span><span class="skill-group" title="{{skillGroupName .Rank}}">{{skillGroup .Rank}}</span></li>{{end}}
+        </ul>
+      </section>
+      {{end}}
+    </aside>
+  </div>
+</article>
+{{end}}
+
+{{define "scoreboard"}}
+<table class="scoreboard">
+  <thead>
+    <tr><th scope="col">Date</th><th scope="col">Map</th><th scope="col">Mode</th><th scope="col">Score</th><th scope="col" class="num">Rating</th><th scope="col" class="num">Premier</th></tr>
+  </thead>
+  <tbody>
+    {{range .}}
+    <tr class="outcome-{{.Outcome}}">
+      <td><time datetime="{{.FinishedAt.Format "2006-01-02T15:04:05Z07:00"}}">{{dayMonth .FinishedAt}}</time></td>
+      <td>{{mapName .Map}}</td>
+      <td>{{source .DataSource .RankType}}</td>
+      <td class="score"><span class="result">{{outcome .Outcome}}</span> {{index .Score 0}}–{{index .Score 1}}</td>
+      <td class="num {{if lt .LeetifyRating 0.0}}neg{{else}}pos{{end}}">{{rating100 .LeetifyRating}}</td>
+      <td class="num">{{if eq (deref .RankType) 11}}{{with premier .Rank}}<span class="mini-plate tier-{{.Tier}}">{{.High}}{{.Low}}</span>{{end}}{{end}}</td>
+    </tr>
+    {{end}}
+  </tbody>
+</table>
+{{end}}
