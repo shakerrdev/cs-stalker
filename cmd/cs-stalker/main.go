@@ -36,18 +36,10 @@ func main() {
 		log.Fatalf("load .env: %v", err)
 	}
 
-	evar, exists := os.LookupEnv("STEAMAPIKEY")
-	if exists {
-		log.Printf("steam api key: %s...", evar[:5])
-	} else {
-		log.Panicf("no steam api key env var set")
-	}
-
-	evar, exists = os.LookupEnv("LEETIFY_AUTH_TOKEN")
-	if exists {
-		log.Printf("leetify auth token: %s...", evar[:5])
-	} else {
-		log.Panicf("no leetify auth token env var set")
+	for _, key := range []string{"STEAMAPIKEY", "LEETIFY_AUTH_TOKEN"} {
+		if os.Getenv(key) == "" {
+			log.Fatalf("missing environment variable: %s", key)
+		}
 	}
 
 	db.Connect()
