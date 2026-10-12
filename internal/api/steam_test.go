@@ -237,3 +237,28 @@ func TestResolveUrl_Invalid(t *testing.T) {
 		}
 	}
 }
+
+func TestPlayerBans(t *testing.T) {
+	tests := []struct {
+		name string
+		body string
+		want Bans
+		any  bool
+	}{
+		{"clean", `{"players":[{"SteamId":"76561198056395137","CommunityBanned":false,"VACBanned":false,"NumberOfVACBans":0,"DaysSinceLastBan":0,"NumberOfGameBans":0,"EconomyBan":"none"}]}`, Bans{}, false},
+		{"banned", `{"players":[{"SteamId":"76561198056395137","CommunityBanned":true,"VACBanned":true,"NumberOfVACBans":2,"DaysSinceLastBan":340,"NumberOfGameBans":1,"EconomyBan":"probation"}]}`,
+			Bans{VACBans: 2, GameBans: 1, DaysSinceLastBan: 340, CommunityBanned: true, TradeBan: "probation"}, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			steamResponds(t, tt.body)
+			bans, err := PlayerBans("76561198056395137")
+			if err != nil {
+				t.Fatal(err)
+			}
+			if bans != tt.want || bans.Any() != tt.any {
+				t.Errorf("bans = %+v (any %v), want %+v (any %v)", bans, bans.Any(), tt.want, tt.any)
+			}
+		})
+	}
+}

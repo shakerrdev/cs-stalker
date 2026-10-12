@@ -183,3 +183,45 @@ func UserPlaytime(steam64id string) (int32, error) {
 	}
 	return 0, fmt.Errorf("UserPlaytime: no cs playtime found for %s", steam64id)
 }
+
+type Bans struct {
+	VACBans          int
+	GameBans         int
+	DaysSinceLastBan int
+	CommunityBanned  bool
+	TradeBan         string
+}
+
+func (b Bans) Any() bool {
+	return b.VACBans > 0 || b.GameBans > 0 || b.CommunityBanned || b.TradeBan != ""
+}
+
+func PlayerBans(steam64id string) (Bans, error) {
+	var body struct {
+		Players []struct {
+			CommunityBanned  bool
+			NumberOfVACBans  int
+			NumberOfGameBans int
+			DaysSinceLastBan int
+			EconomyBan       string
+		} `json:"players"`
+	}
+	if err := steamGet("ISteamUser/GetPlayerBans/v1", url.Values{"steamids": {steam64id}}, &body); err != nil {
+		return Bans{}, fmt.Errorf("PlayerBans: %w", err)
+	}
+	if len(body.Players) == 0 {
+		return Bans{}, fmt.Errorf("PlayerBans: %s: %w", steam64id, ErrNotFound)
+	}
+
+	player := body.Players[0]
+	bans := Bans{
+		VACBans:          player.NumberOfVACBans,
+		GameBans:         player.NumberOfGameBans,
+		DaysSinceLastBan: player.DaysSinceLastBan,
+		CommunityBanned:  player.CommunityBanned,
+	}
+	if player.EconomyBan != "" && player.EconomyBan != "none" {
+		bans.TradeBan = player.EconomyBan
+	}
+	return bans, nil
+}
