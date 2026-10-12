@@ -30,11 +30,16 @@ func NewRouter(root string) (http.Handler, error) {
 	mux := http.NewServeMux()
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir(filepath.Join(root, "static")))))
 	mux.HandleFunc("GET /{$}", s.index)
+	mux.HandleFunc("GET /healthz", healthz)
 	mux.HandleFunc("GET /minion", s.minion)
 	mux.HandleFunc("GET /api", apiRootHandler)
 	mux.HandleFunc("GET /api/resolveurl", apiResolveUrlHandler)
 	mux.HandleFunc("POST /profile", s.profile)
 	return mux, nil
+}
+
+func healthz(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("ok"))
 }
 
 func (s *site) render(w http.ResponseWriter, name string, data any) {

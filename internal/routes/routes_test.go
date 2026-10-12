@@ -61,3 +61,10 @@ func TestProfileLookupShowsErrors(t *testing.T) {
 		t.Errorf("body = %q", rec.Body.String())
 	}
 }
+
+func TestHealthz(t *testing.T) {
+	rec := get(newTestRouter(t), "/healthz")
+	if rec.Code != http.StatusOK || rec.Body.String() != "ok" {
+		t.Errorf("GET /healthz = %d %q", rec.Code, rec.Body.String())
+	}
+}

@@ -7,7 +7,7 @@ services:
     branch: main
     buildCommand: go build -tags netgo -ldflags '-s -w' -o app ./cmd/cs-stalker
     startCommand: ./app
-    healthCheckPath: /
+    healthCheckPath: /healthz
     envVars:
       - key: STEAMAPIKEY
         sync: false
