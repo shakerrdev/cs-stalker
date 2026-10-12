@@ -51,7 +51,11 @@ func main() {
 	}
 	log.Println("connected to database")
 
-	router := loggingMiddleware(routes.NewRouter())
+	handler, err := routes.NewRouter(".")
+	if err != nil {
+		log.Fatal(err)
+	}
+	router := loggingMiddleware(handler)
 	port := ":8085"
 
 	s := &http.Server{
