@@ -5,7 +5,7 @@ import "gorm.io/gorm"
 type FaceitProfile struct {
 	gorm.Model
 
-	FaceitID uint   `gorm:"uniqueIndex;not null"`
+	FaceitID string `gorm:"uniqueIndex;not null;size:36"`
 	PlayerID uint   `gorm:"uniqueIndex;not null"`
 	Nickname string `gorm:"size:128"`
 	ELO      int
