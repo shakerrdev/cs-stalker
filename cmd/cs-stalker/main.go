@@ -43,13 +43,17 @@ func main() {
 	}
 
 	dsn, err := db.DSNFromEnv()
-	if err != nil {
+	switch {
+	case errors.Is(err, db.ErrNotConfigured):
+		log.Println("no database configured, running without one")
+	case err != nil:
 		log.Fatal(err)
+	default:
+		if err := db.Connect(dsn); err != nil {
+			log.Fatal(err)
+		}
+		log.Println("connected to database")
 	}
-	if err := db.Connect(dsn); err != nil {
-		log.Fatal(err)
-	}
-	log.Println("connected to database")
 
 	router, err := routes.NewRouter(".")
 	if err != nil {

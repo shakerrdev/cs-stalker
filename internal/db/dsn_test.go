@@ -1,6 +1,7 @@
 package db
 
 import (
+	"errors"
 	"os"
 	"testing"
 
@@ -41,8 +42,19 @@ func TestDSNFromEnv_Missing(t *testing.T) {
 	setDBEnv(t)
 	os.Unsetenv("DB_NAME")
 
-	if _, err := DSNFromEnv(); err == nil {
-		t.Fatal("expected an error for missing DB_NAME")
+	if _, err := DSNFromEnv(); err == nil || errors.Is(err, ErrNotConfigured) {
+		t.Fatalf("expected a missing DB_NAME error, got %v", err)
+	}
+}
+
+func TestDSNFromEnv_NotConfigured(t *testing.T) {
+	setDBEnv(t)
+	for _, key := range []string{"DATABASE_URL", "DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME"} {
+		os.Unsetenv(key)
+	}
+
+	if _, err := DSNFromEnv(); !errors.Is(err, ErrNotConfigured) {
+		t.Fatalf("err = %v, want ErrNotConfigured", err)
 	}
 }
 

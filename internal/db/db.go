@@ -1,6 +1,7 @@
 package db
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -14,6 +15,8 @@ import (
 )
 
 var DB *gorm.DB
+
+var ErrNotConfigured = errors.New("no database configured")
 
 func DSNFromEnv() (string, error) {
 	if url := os.Getenv("DATABASE_URL"); url != "" {
@@ -29,6 +32,9 @@ func DSNFromEnv() (string, error) {
 			missing = append(missing, key)
 		}
 		values[key] = value
+	}
+	if len(missing) == len(keys) {
+		return "", ErrNotConfigured
 	}
 	if len(missing) > 0 {
 		return "", fmt.Errorf("missing environment variables: %s", strings.Join(missing, ", "))
