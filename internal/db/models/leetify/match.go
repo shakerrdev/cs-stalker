@@ -23,6 +23,11 @@ type LeetifyMatch struct {
 	Profiles    []LeetifyProfile `gorm:"many2many:leetify_match_profiles;"`
 }
 
+type LeetifyMatchProfile struct {
+	LeetifyMatchID   uint `gorm:"primaryKey"`
+	LeetifyProfileID uint `gorm:"primaryKey;index"`
+}
+
 type LeetifyMatchDetails struct {
 	gorm.Model
 	LeetifyMatchID uint `gorm:"uniqueIndex"`

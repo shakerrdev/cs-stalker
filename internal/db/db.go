@@ -47,6 +47,19 @@ func Connect(dsn string) error {
 }
 
 func Migrate(conn *gorm.DB) error {
+	joinTables := []struct {
+		model any
+		field string
+	}{
+		{&leetify.LeetifyMatch{}, "Profiles"},
+		{&leetify.LeetifyProfile{}, "Matches"},
+	}
+	for _, jt := range joinTables {
+		if err := conn.SetupJoinTable(jt.model, jt.field, &leetify.LeetifyMatchProfile{}); err != nil {
+			return fmt.Errorf("set up join table for %T.%s: %w", jt.model, jt.field, err)
+		}
+	}
+
 	err := conn.AutoMigrate(
 		&models.Player{},
 		&models.Match{},
