@@ -2,6 +2,8 @@
 
 Look up a Counter-Strike player by their Steam profile and see their Steam and Leetify data: bans, ranks, ratings, stats, recent matches and who they play with.
 
+Search from the home page with a profile link, custom URL or Steam64 ID. Every player has a page at `/player/<Steam64 ID>` that can be bookmarked or shared, and teammates link to their own pages.
+
 ## Running
 
 Needs Go 1.24+. PostgreSQL 13+ is optional: without database settings the app runs without one, which is enough for lookups since nothing is stored yet.
