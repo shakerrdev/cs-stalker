@@ -20,6 +20,7 @@ func NewRouter(root string) (http.Handler, error) {
 		filepath.Join(root, "templates", "index.html"),
 		filepath.Join(root, "templates", "fragments", "minion.html"),
 		filepath.Join(root, "templates", "fragments", "profile.html"),
+		filepath.Join(root, "templates", "fragments", "profile_error.html"),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("parse templates: %w", err)
@@ -55,7 +56,19 @@ func (s *site) minion(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *site) profile(w http.ResponseWriter, r *http.Request) {
-	steam64id, _ := api.ResolveUrl(r.PostFormValue("url"))
-	summary, _ := api.UserSummary(steam64id)
+	steam64id, err := api.ResolveUrl(r.PostFormValue("url"))
+	if err != nil {
+		log.Printf("profile: %v", err)
+		s.render(w, "profile_error.html", "No Steam profile found for that URL")
+		return
+	}
+
+	summary, err := api.UserSummary(steam64id)
+	if err != nil {
+		log.Printf("profile: %v", err)
+		s.render(w, "profile_error.html", "Couldn't load that Steam profile")
+		return
+	}
+
 	s.render(w, "profile.html", summary)
 }

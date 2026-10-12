@@ -3,6 +3,7 @@ package routes
 import (
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 )
@@ -46,5 +47,17 @@ func TestPages(t *testing.T) {
 func TestUnknownPathIsNotFound(t *testing.T) {
 	if rec := get(newTestRouter(t), "/does-not-exist"); rec.Code != http.StatusNotFound {
 		t.Errorf("status = %d, want 404", rec.Code)
+	}
+}
+
+func TestProfileLookupShowsErrors(t *testing.T) {
+	form := url.Values{"url": {"https://example.com/not-a-profile"}}
+	req := httptest.NewRequest(http.MethodPost, "/profile", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	rec := httptest.NewRecorder()
+	newTestRouter(t).ServeHTTP(rec, req)
+
+	if !strings.Contains(rec.Body.String(), "No Steam profile found") {
+		t.Errorf("body = %q", rec.Body.String())
 	}
 }
