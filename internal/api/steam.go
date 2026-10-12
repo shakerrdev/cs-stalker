@@ -19,11 +19,13 @@ type Summary struct {
 	IsPublic  bool
 }
 
+var SteamBaseURL = "https://api.steampowered.com"
+
 func steamGet(method string, params url.Values, out any) error {
 	params.Set("key", os.Getenv("STEAMAPIKEY"))
 
 	log.Printf("GET steam %s", method)
-	resp, err := steamClient.Get("https://api.steampowered.com/" + method + "/?" + params.Encode())
+	resp, err := steamClient.Get(SteamBaseURL + "/" + method + "/?" + params.Encode())
 	if err != nil {
 		// url.Error repeats the request URL, which contains the API key.
 		var urlErr *url.Error
@@ -60,6 +62,10 @@ func resolveVanityUrl(vanityUrl string) (string, error) {
 }
 
 var steam64Pattern = regexp.MustCompile(`^7656\d{13}$`)
+
+func IsSteam64(id string) bool {
+	return steam64Pattern.MatchString(id)
+}
 
 func ResolveUrl(input string) (string, error) {
 	input = strings.TrimSpace(input)
