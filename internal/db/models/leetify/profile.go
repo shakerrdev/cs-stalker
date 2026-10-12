@@ -1,6 +1,10 @@
 package leetify
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type LeetifyProfile struct {
 	gorm.Model
@@ -66,7 +70,7 @@ type LeetifyHighlight struct {
 	RoundNumber      int
 	ThumbnailURL     string
 	URL              string
-	CreatedAt        string
+	LeetifyCreatedAt time.Time
 }
 
 type LeetifyPersonalBest struct {
