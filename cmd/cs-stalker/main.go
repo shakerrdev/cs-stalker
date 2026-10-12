@@ -56,11 +56,16 @@ func main() {
 		log.Fatal(err)
 	}
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8085"
+	}
+
 	s := &http.Server{
-		Addr:    ":8085",
+		Addr:    ":" + port,
 		Handler: logRequests(trimTrailingSlash(router)),
 	}
 
-	log.Printf("server listening on http://localhost%s", s.Addr)
+	log.Printf("server listening on http://localhost:%s", port)
 	log.Fatal(s.ListenAndServe())
 }
