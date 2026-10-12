@@ -70,8 +70,13 @@ func TestUserSummary_EmptyResponse(t *testing.T) {
 }
 
 func TestUserPlaytime(t *testing.T) {
-	mockResp := `{"response":{"games":[{"appid":730,"playtime_forever":120}]}}`
-	steamResponds(t, mockResp)
+	t.Setenv("STEAMAPIKEY", "mock")
+	useSteamServer(t, func(w http.ResponseWriter, r *http.Request) {
+		if !strings.Contains(r.URL.Path, "GetOwnedGames") || r.URL.Query().Get("include_played_free_games") != "1" {
+			t.Errorf("unexpected request %s", r.URL)
+		}
+		io.WriteString(w, `{"response":{"games":[{"appid":10,"playtime_forever":30},{"appid":730,"playtime_forever":120}]}}`)
+	})
 
 	hours, err := UserPlaytime("76561198056395137")
 	if err != nil {

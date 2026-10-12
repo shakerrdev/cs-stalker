@@ -125,7 +125,8 @@ func UserPlaytime(steam64id string) (int32, error) {
 			} `json:"games"`
 		} `json:"response"`
 	}
-	if err := steamGet("IPlayerService/GetRecentlyPlayedGames/v1", url.Values{"steamid": {steam64id}}, &body); err != nil {
+	params := url.Values{"steamid": {steam64id}, "include_played_free_games": {"1"}}
+	if err := steamGet("IPlayerService/GetOwnedGames/v1", params, &body); err != nil {
 		return 0, fmt.Errorf("UserPlaytime: %w", err)
 	}
 
