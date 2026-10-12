@@ -3,27 +3,20 @@ package api
 import (
 	"io"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 )
 
-func makeMockClient(t *testing.T, responseBody string, statusCode int) *http.Client {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(statusCode)
-		io.WriteString(w, responseBody)
-	}))
-	t.Cleanup(server.Close)
-
-	return &http.Client{
-		Transport: rewriteHostTransport(server.URL),
-	}
+func steamResponds(t *testing.T, body string) {
+	t.Helper()
+	t.Setenv("STEAMAPIKEY", "mock")
+	useSteamServer(t, func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, body)
+	})
 }
 
 func TestResolveVanityUrl(t *testing.T) {
 	mockResp := `{"response":{"steamid":"76561198056395137","success":1}}`
-	client := makeMockClient(t, mockResp, http.StatusOK)
-	setSteamClient(client)
-	t.Setenv("STEAMAPIKEY", "mock")
+	steamResponds(t, mockResp)
 
 	id, err := resolveVanityUrl("testuser")
 	if err != nil {
@@ -36,9 +29,7 @@ func TestResolveVanityUrl(t *testing.T) {
 
 func TestResolveVanityUrl_Failure(t *testing.T) {
 	mockResp := `{"response":{"success":42,"message":"No match"}}`
-	client := makeMockClient(t, mockResp, http.StatusOK)
-	setSteamClient(client)
-	t.Setenv("STEAMAPIKEY", "mock")
+	steamResponds(t, mockResp)
 
 	_, err := resolveVanityUrl("unknown_user")
 	if err == nil {
@@ -48,9 +39,7 @@ func TestResolveVanityUrl_Failure(t *testing.T) {
 
 func TestUserSummary(t *testing.T) {
 	mockResp := `{"response":{"players":[{"steamid":"76561198056395137","communityvisibilitystate":3,"personaname":"TestUser","avatarfull":"http://example.com/avatar.jpg"}]}}`
-	client := makeMockClient(t, mockResp, http.StatusOK)
-	setSteamClient(client)
-	t.Setenv("STEAMAPIKEY", "mock")
+	steamResponds(t, mockResp)
 
 	summary, err := UserSummary("76561198056395137")
 	if err != nil {
@@ -66,9 +55,7 @@ func TestUserSummary(t *testing.T) {
 
 func TestUserSummary_EmptyResponse(t *testing.T) {
 	mockResp := `{"response":{"players":[]}}`
-	client := makeMockClient(t, mockResp, http.StatusOK)
-	setSteamClient(client)
-	t.Setenv("STEAMAPIKEY", "mock")
+	steamResponds(t, mockResp)
 
 	_, err := UserSummary("76561198056395137")
 	if err == nil {
@@ -78,9 +65,7 @@ func TestUserSummary_EmptyResponse(t *testing.T) {
 
 func TestUserPlaytime(t *testing.T) {
 	mockResp := `{"response":{"games":[{"appid":730,"playtime_forever":120}]}}`
-	client := makeMockClient(t, mockResp, http.StatusOK)
-	setSteamClient(client)
-	t.Setenv("STEAMAPIKEY", "mock")
+	steamResponds(t, mockResp)
 
 	hours, err := UserPlaytime("76561198056395137")
 	if err != nil {
@@ -93,9 +78,7 @@ func TestUserPlaytime(t *testing.T) {
 
 func TestUserPlaytime_NotFound(t *testing.T) {
 	mockResp := `{"response":{"games":[{"appid":999,"playtime_forever":200}]}}`
-	client := makeMockClient(t, mockResp, http.StatusOK)
-	setSteamClient(client)
-	t.Setenv("STEAMAPIKEY", "mock")
+	steamResponds(t, mockResp)
 
 	_, err := UserPlaytime("76561198056395137")
 	if err == nil {
