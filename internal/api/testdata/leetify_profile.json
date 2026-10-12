@@ -1,0 +1,38 @@
+{
+  "privacy_mode": "public",
+  "winrate": 0.5512,
+  "total_matches": 812,
+  "first_match_date": "2021-03-14T18:02:11.000Z",
+  "name": "tester",
+  "bans": [{"platform": "faceit", "platform_nickname": "tester_fc", "banned_since": "2024-05-02T10:00:00.000Z"}],
+  "steam64_id": "76561198056395137",
+  "id": "5ea07280-2399-4c7e-88ab-f2f7db0c449f",
+  "ranks": {
+    "leetify": 1.5699999999999998,
+    "premier": 18234,
+    "faceit": 7,
+    "faceit_elo": 1650,
+    "wingman": 12,
+    "renown": null,
+    "competitive": [{"map_name": "de_mirage", "rank": 15}, {"map_name": "de_overpass", "rank": 0}]
+  },
+  "rating": {"aim": 74.1475, "positioning": 61.5661, "utility": 52.548, "clutch": 0.104, "opening": -0.018, "ct_leetify": 0.0065, "t_leetify": 0.0276},
+  "stats": {
+    "accuracy_enemy_spotted": 35.7921, "accuracy_head": 28.3531, "counter_strafing_good_shots_ratio": 78.9447,
+    "ct_opening_aggression_success_rate": 55.8728, "ct_opening_duel_success_percentage": 51.7815,
+    "flashbang_hit_foe_avg_duration": 2.9374, "flashbang_hit_foe_per_flashbang": 0.5231, "flashbang_hit_friend_per_flashbang": 0.3521,
+    "flashbang_leading_to_kill": 12.9386, "flashbang_thrown": 6.8799, "he_foes_damage_avg": 7.2951, "he_friends_damage_avg": 0.4032,
+    "preaim": 9.3346, "reaction_time_ms": 545.4882, "spray_accuracy": 39.3751,
+    "t_opening_aggression_success_rate": 55.315, "t_opening_duel_success_percentage": 48.6341,
+    "traded_deaths_success_percentage": 58.1429, "trade_kill_opportunities_per_round": 0.2835, "trade_kills_success_percentage": 54.65,
+    "utility_on_death_avg": 227.4232
+  },
+  "recent_matches": [
+    {"id": "21a70540-d0da-4f67-945e-7bf7600dd31b", "finished_at": "2026-10-11T13:41:01.000Z", "data_source": "matchmaking", "outcome": "win", "rank": 18234, "rank_type": 11, "map_name": "de_anubis", "leetify_rating": 0.048, "score": [13, 8], "preaim": 8.08, "reaction_time_ms": 512, "accuracy_enemy_spotted": 35.71, "accuracy_head": 30.71, "spray_accuracy": 25.64},
+    {"id": "0dcfc43e-0652-4239-a9b3-1d71c3e5aacf", "finished_at": "2026-10-10T20:20:22.000Z", "data_source": "faceit", "outcome": "loss", "rank": 0, "rank_type": null, "map_name": "de_mirage", "leetify_rating": -0.0318, "score": [9, 13], "preaim": 10.13, "reaction_time_ms": 561, "accuracy_enemy_spotted": 25, "accuracy_head": 23.81, "spray_accuracy": 30}
+  ],
+  "recent_teammates": [
+    {"steam64_id": "76561198000000001", "recent_matches_count": 33},
+    {"steam64_id": "76561198000000002", "recent_matches_count": 12}
+  ]
+}

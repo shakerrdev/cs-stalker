@@ -37,6 +37,6 @@ func useLeetifyServer(t *testing.T, handler http.HandlerFunc) {
 	t.Cleanup(server.Close)
 
 	previous := leetifyClient
-	leetifyClient = &http.Client{Transport: &authTransport{Transport: rewriteHostTransport(server.URL)}}
+	leetifyClient = &http.Client{Transport: rewriteHostTransport(server.URL)}
 	t.Cleanup(func() { leetifyClient = previous })
 }

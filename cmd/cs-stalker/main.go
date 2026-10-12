@@ -39,9 +39,6 @@ func main() {
 	if os.Getenv("STEAMAPIKEY") == "" {
 		log.Fatal("missing environment variable: STEAMAPIKEY")
 	}
-	if os.Getenv("LEETIFY_AUTH_TOKEN") == "" {
-		log.Println("LEETIFY_AUTH_TOKEN not set, leetify lookups will fail")
-	}
 
 	dsn, err := db.DSNFromEnv()
 	switch {
