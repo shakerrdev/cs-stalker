@@ -25,7 +25,7 @@ type LeetifyMatch struct {
 
 type LeetifyMatchDetails struct {
 	gorm.Model
-	LeetifyMatchID uint
+	LeetifyMatchID uint `gorm:"uniqueIndex"`
 	Tickrate       int
 	Ticks          int
 	ServerName     string
@@ -33,8 +33,8 @@ type LeetifyMatchDetails struct {
 
 type LeetifyPlayerStats struct {
 	gorm.Model
-	LeetifyMatchID   uint
-	LeetifyProfileID uint
+	LeetifyMatchID   uint `gorm:"index"`
+	LeetifyProfileID uint `gorm:"index"`
 	Steam64Id        string
 	Name             string
 	Kills            int
@@ -62,7 +62,7 @@ type LeetifyPlayerStats struct {
 
 type LeetifyAgent struct {
 	gorm.Model
-	LeetifyMatchID uint
+	LeetifyMatchID uint `gorm:"index"`
 	Steam64Id      string
 	TeamNumber     int
 	Skin           string
@@ -70,7 +70,7 @@ type LeetifyAgent struct {
 
 type LeetifyParty struct {
 	gorm.Model
-	LeetifyMatchID uint
+	LeetifyMatchID uint `gorm:"index"`
 	Steam64Id      string
 	Party          int
 }

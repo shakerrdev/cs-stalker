@@ -36,7 +36,7 @@ type LeetifyProfile struct {
 
 type LeetifyClub struct {
 	gorm.Model
-	LeetifyProfileID uint
+	LeetifyProfileID uint   `gorm:"uniqueIndex"`
 	ClubID           string `gorm:"index"`
 	Name             string
 	Tag              string
@@ -44,7 +44,7 @@ type LeetifyClub struct {
 
 type LeetifyTeammate struct {
 	gorm.Model
-	LeetifyProfileID      uint
+	LeetifyProfileID      uint `gorm:"index"`
 	Steam64Id             string
 	SteamNickname         string
 	SteamAvatarURL        string
@@ -56,7 +56,7 @@ type LeetifyTeammate struct {
 
 type LeetifyRank struct {
 	gorm.Model
-	LeetifyTeammateID uint
+	LeetifyTeammateID uint `gorm:"uniqueIndex"`
 	Type              string
 	DataSource        string
 	SkillLevel        int
@@ -64,7 +64,7 @@ type LeetifyRank struct {
 
 type LeetifyHighlight struct {
 	gorm.Model
-	LeetifyProfileID uint
+	LeetifyProfileID uint `gorm:"index"`
 	Description      string
 	GameID           string
 	RoundNumber      int
@@ -75,7 +75,7 @@ type LeetifyHighlight struct {
 
 type LeetifyPersonalBest struct {
 	gorm.Model
-	LeetifyProfileID uint
+	LeetifyProfileID uint `gorm:"index"`
 	GameID           string
 	SkillID          string
 	Value            string
