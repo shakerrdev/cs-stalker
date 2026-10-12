@@ -3,9 +3,9 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
+	"net/url"
 )
 
 type Profile struct {
@@ -47,34 +47,48 @@ type Profile struct {
 
 func LeetifyProfile(steam64id string) (Profile, error) {
 	endpoints := []string{
-		fmt.Sprintf("https://api.leetify.com/api/profile/id/%s", steam64id),
-		fmt.Sprintf("https://api.leetify.com/api/profile/%s", steam64id),
+		"https://api.leetify.com/api/profile/id/" + url.PathEscape(steam64id),
+		"https://api.leetify.com/api/profile/" + url.PathEscape(steam64id),
 	}
 
-	for _, url := range endpoints {
-		req, err := http.NewRequest("GET", url, nil)
+	for _, endpoint := range endpoints {
+		profile, found, err := fetchLeetifyProfile(endpoint)
 		if err != nil {
 			return Profile{}, fmt.Errorf("LeetifyProfile: %w", err)
 		}
-
-		req.Header.Add("Accept", "application/json, text/plain, */*")
-
-		log.Printf("GET %s", url)
-		res, err := leetifyClient.Do(req)
-		if err != nil {
-			return Profile{}, fmt.Errorf("LeetifyProfile: %w", err)
-		}
-		defer res.Body.Close()
-
-		if res.StatusCode == 200 {
-			body, _ := io.ReadAll(res.Body)
-
-			var profile Profile
-			json.Unmarshal(body, &profile)
-
+		if found {
 			return profile, nil
 		}
 	}
 
-	return Profile{}, fmt.Errorf("LeetifyProfile: no valid profile found (tried both /id and plain endpoints)")
+	return Profile{}, fmt.Errorf("LeetifyProfile: no profile found for %s", steam64id)
+}
+
+func fetchLeetifyProfile(endpoint string) (Profile, bool, error) {
+	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	if err != nil {
+		return Profile{}, false, err
+	}
+	req.Header.Set("Accept", "application/json")
+
+	log.Printf("GET %s", endpoint)
+	res, err := leetifyClient.Do(req)
+	if err != nil {
+		return Profile{}, false, err
+	}
+	defer res.Body.Close()
+
+	switch res.StatusCode {
+	case http.StatusOK:
+	case http.StatusNotFound:
+		return Profile{}, false, nil
+	default:
+		return Profile{}, false, fmt.Errorf("GET %s: %s", endpoint, res.Status)
+	}
+
+	var profile Profile
+	if err := json.NewDecoder(res.Body).Decode(&profile); err != nil {
+		return Profile{}, false, fmt.Errorf("decode %s: %w", endpoint, err)
+	}
+	return profile, true, nil
 }

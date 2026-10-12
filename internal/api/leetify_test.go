@@ -43,6 +43,16 @@ func TestLeetifyProfile_SendsAuthHeaderOnce(t *testing.T) {
 	}
 }
 
+func TestLeetifyProfile_MalformedResponse(t *testing.T) {
+	useLeetifyServer(t, func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("<html>maintenance</html>"))
+	})
+
+	if _, err := LeetifyProfile("testid"); err == nil {
+		t.Fatal("expected an error, got none")
+	}
+}
+
 func TestLeetifyProfile_ErrorStatuses(t *testing.T) {
 	for _, status := range []int{http.StatusUnauthorized, http.StatusNotFound, http.StatusInternalServerError} {
 		t.Run(http.StatusText(status), func(t *testing.T) {
