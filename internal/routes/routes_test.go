@@ -42,3 +42,9 @@ func TestPages(t *testing.T) {
 		}
 	}
 }
+
+func TestUnknownPathIsNotFound(t *testing.T) {
+	if rec := get(newTestRouter(t), "/does-not-exist"); rec.Code != http.StatusNotFound {
+		t.Errorf("status = %d, want 404", rec.Code)
+	}
+}

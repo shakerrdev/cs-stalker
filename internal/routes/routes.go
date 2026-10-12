@@ -28,7 +28,7 @@ func NewRouter(root string) (http.Handler, error) {
 
 	mux := http.NewServeMux()
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir(filepath.Join(root, "static")))))
-	mux.HandleFunc("GET /", s.index)
+	mux.HandleFunc("GET /{$}", s.index)
 	mux.HandleFunc("GET /minion", s.minion)
 	mux.HandleFunc("GET /api", apiRootHandler)
 	mux.HandleFunc("GET /api/resolveurl", apiResolveUrlHandler)
