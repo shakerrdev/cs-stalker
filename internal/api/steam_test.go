@@ -134,3 +134,46 @@ func TestSteamRequestKeepsKeyOutOfLogsAndErrors(t *testing.T) {
 		t.Errorf("log leaks api key: %s", logs.String())
 	}
 }
+
+func TestResolveUrl(t *testing.T) {
+	steamResponds(t, `{"response":{"steamid":"76561197960287930","success":1}}`)
+
+	tests := []struct {
+		input string
+		want  string
+	}{
+		{"76561198056395137", "76561198056395137"},
+		{"  76561198056395137  ", "76561198056395137"},
+		{"https://steamcommunity.com/profiles/76561198056395137", "76561198056395137"},
+		{"https://steamcommunity.com/profiles/76561198056395137/", "76561198056395137"},
+		{"https://steamcommunity.com/profiles/76561198056395137/?l=german", "76561198056395137"},
+		{"steamcommunity.com/profiles/76561198056395137", "76561198056395137"},
+		{"https://steamcommunity.com/id/gabelogannewell", "76561197960287930"},
+		{"https://steamcommunity.com/id/gabelogannewell/#top", "76561197960287930"},
+		{"gabelogannewell", "76561197960287930"},
+	}
+	for _, tt := range tests {
+		got, err := ResolveUrl(tt.input)
+		if err != nil {
+			t.Errorf("ResolveUrl(%q): unexpected error: %v", tt.input, err)
+			continue
+		}
+		if got != tt.want {
+			t.Errorf("ResolveUrl(%q) = %q, want %q", tt.input, got, tt.want)
+		}
+	}
+}
+
+func TestResolveUrl_Invalid(t *testing.T) {
+	for _, input := range []string{
+		"",
+		"https://steamcommunity.com/profiles/not-an-id",
+		"https://steamcommunity.com/profiles/123",
+		"https://steamcommunity.com/groups/somegroup",
+		"https://example.com/",
+	} {
+		if got, err := ResolveUrl(input); err == nil {
+			t.Errorf("ResolveUrl(%q) = %q, want an error", input, got)
+		}
+	}
+}

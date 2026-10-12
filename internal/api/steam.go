@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -58,27 +59,34 @@ func resolveVanityUrl(vanityUrl string) (string, error) {
 	return body.Response.SteamID, nil
 }
 
-func ResolveUrl(url string) (string, error) {
-	url = strings.TrimSpace(url)
-	url = strings.TrimSuffix(url, "/")
-	splitUrl := strings.Split(url, "/")
-	vanityurl := splitUrl[len(splitUrl)-1]
+var steam64Pattern = regexp.MustCompile(`^7656\d{13}$`)
 
-	if len(splitUrl) < 3 {
-		return resolveVanityUrl(vanityurl)
+func ResolveUrl(input string) (string, error) {
+	input = strings.TrimSpace(input)
+	switch {
+	case input == "":
+		return "", fmt.Errorf("ResolveUrl: empty input")
+	case steam64Pattern.MatchString(input):
+		return input, nil
+	case !strings.Contains(input, "/"):
+		return resolveVanityUrl(input)
 	}
 
-	// TODO: CHECK FOR STEAMID64
-
-	if splitUrl[len(splitUrl)-2] == "id" {
-		return resolveVanityUrl(vanityurl)
+	if i := strings.IndexAny(input, "?#"); i >= 0 {
+		input = input[:i]
+	}
+	segments := strings.Split(strings.TrimSuffix(input, "/"), "/")
+	if len(segments) >= 2 {
+		kind, value := segments[len(segments)-2], segments[len(segments)-1]
+		switch {
+		case kind == "id" && value != "":
+			return resolveVanityUrl(value)
+		case kind == "profiles" && steam64Pattern.MatchString(value):
+			return value, nil
+		}
 	}
 
-	if splitUrl[len(splitUrl)-2] == "profiles" {
-		return vanityurl, nil
-	}
-
-	return "", fmt.Errorf("ResolveUrl: unable to parse url")
+	return "", fmt.Errorf("ResolveUrl: not a steam profile url: %q", input)
 }
 
 func UserSummary(steam64id string) (Summary, error) {
