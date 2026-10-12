@@ -14,7 +14,7 @@ type Player struct {
 	Name      string   `gorm:"size:128"`
 	AvatarURL string   `gorm:"size:256"`
 	Region    string   `gorm:"size:64"`
-	Bans      []string `gorm:"type:jsonb"`
+	Bans      []string `gorm:"type:jsonb;serializer:json"`
 
 	LeetifyProfile leetify.LeetifyProfile
 	FaceitProfile  faceit.FaceitProfile
