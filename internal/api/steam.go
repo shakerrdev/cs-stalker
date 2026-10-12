@@ -10,13 +10,22 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 )
 
+var ErrNotFound = errors.New("not found")
+
 type Summary struct {
-	Steam64id string
-	Avatar    string
-	Name      string
-	IsPublic  bool
+	Steam64id    string
+	Name         string
+	Avatar       string
+	AvatarMedium string
+	ProfileURL   string
+	IsPublic     bool
+	PersonaState int
+	Game         string
+	Created      time.Time
+	CountryCode  string
 }
 
 var SteamBaseURL = "https://api.steampowered.com"
@@ -95,31 +104,62 @@ func ResolveUrl(input string) (string, error) {
 	return "", fmt.Errorf("ResolveUrl: not a steam profile url: %q", input)
 }
 
-func UserSummary(steam64id string) (Summary, error) {
-	var body struct {
-		Response struct {
-			Players []struct {
-				SteamID                  string `json:"steamid"`
-				CommunityVisibilityState int    `json:"communityvisibilitystate"`
-				PersonaName              string `json:"personaname"`
-				AvatarFull               string `json:"avatarfull"`
-			} `json:"players"`
-		} `json:"response"`
+func PlayerSummaries(steam64ids []string) (map[string]Summary, error) {
+	summaries := make(map[string]Summary, len(steam64ids))
+	for start := 0; start < len(steam64ids); start += 100 {
+		batch := steam64ids[start:min(start+100, len(steam64ids))]
+		var body struct {
+			Response struct {
+				Players []struct {
+					SteamID                  string `json:"steamid"`
+					CommunityVisibilityState int    `json:"communityvisibilitystate"`
+					PersonaName              string `json:"personaname"`
+					ProfileURL               string `json:"profileurl"`
+					AvatarMedium             string `json:"avatarmedium"`
+					AvatarFull               string `json:"avatarfull"`
+					PersonaState             int    `json:"personastate"`
+					GameExtraInfo            string `json:"gameextrainfo"`
+					TimeCreated              int64  `json:"timecreated"`
+					LocCountryCode           string `json:"loccountrycode"`
+				} `json:"players"`
+			} `json:"response"`
+		}
+		params := url.Values{"steamids": {strings.Join(batch, ",")}}
+		if err := steamGet("ISteamUser/GetPlayerSummaries/v2", params, &body); err != nil {
+			return nil, fmt.Errorf("PlayerSummaries: %w", err)
+		}
+
+		for _, player := range body.Response.Players {
+			summary := Summary{
+				Steam64id:    player.SteamID,
+				Name:         player.PersonaName,
+				Avatar:       player.AvatarFull,
+				AvatarMedium: player.AvatarMedium,
+				ProfileURL:   player.ProfileURL,
+				IsPublic:     player.CommunityVisibilityState == 3,
+				PersonaState: player.PersonaState,
+				Game:         player.GameExtraInfo,
+				CountryCode:  player.LocCountryCode,
+			}
+			if player.TimeCreated > 0 {
+				summary.Created = time.Unix(player.TimeCreated, 0).UTC()
+			}
+			summaries[player.SteamID] = summary
+		}
 	}
-	if err := steamGet("ISteamUser/GetPlayerSummaries/v2", url.Values{"steamids": {steam64id}}, &body); err != nil {
+	return summaries, nil
+}
+
+func UserSummary(steam64id string) (Summary, error) {
+	summaries, err := PlayerSummaries([]string{steam64id})
+	if err != nil {
 		return Summary{}, fmt.Errorf("UserSummary: %w", err)
 	}
-	if len(body.Response.Players) == 0 {
-		return Summary{}, fmt.Errorf("UserSummary: no player found for %s", steam64id)
+	summary, ok := summaries[steam64id]
+	if !ok {
+		return Summary{}, fmt.Errorf("UserSummary: %s: %w", steam64id, ErrNotFound)
 	}
-
-	player := body.Response.Players[0]
-	return Summary{
-		Steam64id: player.SteamID,
-		Avatar:    player.AvatarFull,
-		Name:      player.PersonaName,
-		IsPublic:  player.CommunityVisibilityState == 3,
-	}, nil
+	return summary, nil
 }
 
 func UserPlaytime(steam64id string) (int32, error) {

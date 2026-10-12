@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 )
 
 func steamResponds(t *testing.T, body string) {
@@ -64,8 +66,61 @@ func TestUserSummary_EmptyResponse(t *testing.T) {
 	steamResponds(t, mockResp)
 
 	_, err := UserSummary("76561198056395137")
-	if err == nil {
-		t.Fatal("expected error, got none")
+	if !errors.Is(err, ErrNotFound) {
+		t.Fatalf("err = %v, want ErrNotFound", err)
+	}
+}
+
+func TestPlayerSummaries(t *testing.T) {
+	t.Setenv("STEAMAPIKEY", "mock")
+	var asked []string
+	useSteamServer(t, func(w http.ResponseWriter, r *http.Request) {
+		asked = append(asked, r.URL.Query().Get("steamids"))
+		io.WriteString(w, `{"response":{"players":[
+			{"steamid":"76561198000000001","personaname":"one","profileurl":"https://steamcommunity.com/id/one/","avatarmedium":"m.jpg","avatarfull":"f.jpg",
+			 "communityvisibilitystate":3,"personastate":1,"gameextrainfo":"Counter-Strike 2","timecreated":1331000000,"loccountrycode":"DE"},
+			{"steamid":"76561198000000002","personaname":"two","communityvisibilitystate":1}
+		]}}`)
+	})
+
+	summaries, err := PlayerSummaries([]string{"76561198000000001", "76561198000000002"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(asked) != 1 || asked[0] != "76561198000000001,76561198000000002" {
+		t.Errorf("requests = %q, want one batched request", asked)
+	}
+	one := summaries["76561198000000001"]
+	want := Summary{
+		Steam64id: "76561198000000001", Name: "one", Avatar: "f.jpg", AvatarMedium: "m.jpg",
+		ProfileURL: "https://steamcommunity.com/id/one/", IsPublic: true, PersonaState: 1,
+		Game: "Counter-Strike 2", Created: time.Unix(1331000000, 0).UTC(), CountryCode: "DE",
+	}
+	if one != want {
+		t.Errorf("summary = %+v\nwant %+v", one, want)
+	}
+	if two := summaries["76561198000000002"]; two.IsPublic || !two.Created.IsZero() {
+		t.Errorf("private summary = %+v", two)
+	}
+}
+
+func TestPlayerSummaries_BatchesOf100(t *testing.T) {
+	t.Setenv("STEAMAPIKEY", "mock")
+	var sizes []int
+	useSteamServer(t, func(w http.ResponseWriter, r *http.Request) {
+		sizes = append(sizes, len(strings.Split(r.URL.Query().Get("steamids"), ",")))
+		io.WriteString(w, `{"response":{"players":[]}}`)
+	})
+
+	ids := make([]string, 150)
+	for i := range ids {
+		ids[i] = fmt.Sprintf("765611980%08d", i)
+	}
+	if _, err := PlayerSummaries(ids); err != nil {
+		t.Fatal(err)
+	}
+	if len(sizes) != 2 || sizes[0] != 100 || sizes[1] != 50 {
+		t.Errorf("batch sizes = %v, want [100 50]", sizes)
 	}
 }
 
