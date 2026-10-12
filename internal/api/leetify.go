@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 )
 
 type Profile struct {
@@ -59,7 +58,6 @@ func LeetifyProfile(steam64id string) (Profile, error) {
 		}
 
 		req.Header.Add("Accept", "application/json, text/plain, */*")
-		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", os.Getenv("LEETIFY_AUTH_TOKEN")))
 
 		log.Printf("GET %s", url)
 		res, err := leetifyClient.Do(req)

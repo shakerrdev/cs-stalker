@@ -27,6 +27,22 @@ func TestLeetifyProfile_Success(t *testing.T) {
 	}
 }
 
+func TestLeetifyProfile_SendsAuthHeaderOnce(t *testing.T) {
+	t.Setenv("LEETIFY_AUTH_TOKEN", "mocked-token")
+	var got []string
+	useLeetifyServer(t, func(w http.ResponseWriter, r *http.Request) {
+		got = r.Header.Values("Authorization")
+		json.NewEncoder(w).Encode(Profile{})
+	})
+
+	if _, err := LeetifyProfile("testid"); err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if len(got) != 1 || got[0] != "Bearer mocked-token" {
+		t.Errorf("Authorization headers = %q, want one bearer token", got)
+	}
+}
+
 func TestLeetifyProfile_ErrorStatuses(t *testing.T) {
 	for _, status := range []int{http.StatusUnauthorized, http.StatusNotFound, http.StatusInternalServerError} {
 		t.Run(http.StatusText(status), func(t *testing.T) {
